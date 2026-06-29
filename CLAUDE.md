@@ -14,7 +14,7 @@ the actual project folders live here on disk but are **never tracked** (deny-all
 - **Hard wall with JourneyOS/Yaqeen:** this `.claude/` is self-contained; Personal MCP profile only.
 
 ## Buckets (all gitignored)
-- `personal-projects/` — Qari, qari-assets, emnlabs_showcase
+- `personal-projects/` — Qari, qari-assets, emnlabs_site
 - `freelance-projects/` — art_is_everywear (hidden from public catalog until live)
 - `pocs/` — bil-app
 

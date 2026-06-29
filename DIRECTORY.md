@@ -22,6 +22,6 @@ On-demand map of the umbrella. Load this when you need to know where something l
 ## Projects (on disk, gitignored)
 | Bucket | Projects |
 |---|---|
-| `personal-projects/` | Qari, qari-assets, emnlabs_showcase |
+| `personal-projects/` | Qari, qari-assets, emnlabs_site |
 | `freelance-projects/` | art_is_everywear |
 | `pocs/` | bil-app |
