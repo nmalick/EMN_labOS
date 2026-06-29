@@ -1,5 +1,5 @@
 {
   "_profile": "Personal — Slack, Figma, Notion (claude.ai account connectors, selected at the account level)",
-  "_policy": "Personal profile ONLY. No work connectors (ClickUp, Sentry, Granola, Yaqeen Slack). No secrets are ever stored in this file — it is committed to a public repo.",
+  "_policy": "Personal profile ONLY. No work or organization connectors. No secrets are ever stored in this file — it is committed to a public repo.",
   "mcpServers": {}
 }
