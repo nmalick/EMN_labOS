@@ -1,0 +1,14 @@
+#!/bin/sh
+# EMN_labOS identity guard — enforce personal author + block secrets/work-email in staged content.
+EXPECTED="nmalicksn@gmail.com"
+[ "$(git config user.email)" = "$EXPECTED" ] || { echo "BLOCKED: author != $EXPECTED"; exit 1; }
+# Scan staged additions for secrets/work-email. Exclude hooks/ — it defines these patterns by design.
+files=$(git diff --cached --name-only --diff-filter=ACM | grep -v '^hooks/')
+if [ -n "$files" ]; then
+  hits=$(printf '%s\n' "$files" | tr '\n' '\0' | xargs -0 grep -lEI \
+    'BEGIN (RSA |EC )?PRIVATE KEY|yaqeeninstitute\.org|serviceAccount|firebase-adminsdk' 2>/dev/null)
+  if [ -n "$hits" ]; then
+    echo "BLOCKED: secret/work-email in staged content:"; echo "$hits"; exit 1
+  fi
+fi
+exit 0

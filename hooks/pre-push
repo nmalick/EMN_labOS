@@ -1,0 +1,6 @@
+#!/bin/sh
+# EMN_labOS identity guard — enforce active gh account + personal authorship on outgoing commits.
+[ "$(gh api user --jq .login 2>/dev/null)" = "nmalick" ] || { echo "BLOCKED: active gh != nmalick"; exit 1; }
+bad="$(git log --format='%ae' @{push}..HEAD 2>/dev/null | grep -v '^nmalicksn@gmail.com$' | sort -u)"
+[ -z "$bad" ] || { echo "BLOCKED: non-personal authors: $bad"; exit 1; }
+exit 0

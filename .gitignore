@@ -1,0 +1,41 @@
+# EMN_labOS — DENY ALL, then allowlist only OS files. Project folders are NEVER tracked.
+/*
+**
+# OS scaffold (dir entries before file entries)
+!/.gitignore
+!/README.md
+!/CLAUDE.md
+!/DIRECTORY.md
+!/STATUS.md
+!/ROADMAP.md
+!/RELEASE-NOTES.md
+!/now.md
+!/projects.json
+!/.mcp.json
+!/.claude/
+!/.claude/**
+!/registry/
+!/registry/**
+!/templates/
+!/templates/**
+!/docs/
+!/docs/**
+!/hooks/
+!/hooks/**
+!/claude-output-docs/
+!/claude-output-docs/**
+# Hard re-exclusions (never track even if allowlisted)
+.DS_Store
+**/.git
+**/node_modules/
+.env*
+**/.vercel/
+*.bundle
+# Per-machine Claude overrides (local paths; never publish)
+.claude/settings.local.json
+**/settings.local.json
+.claude/**/*.lock
+# Gitlink guard: never embed a project repo
+/personal-projects/
+/freelance-projects/
+/pocs/
