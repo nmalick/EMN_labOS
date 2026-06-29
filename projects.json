@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "name": "EMN Labs",
+    "slug": "emnlabs_site",
+    "bucket": "personal",
+    "status": "live",
+    "stack": [
+      "React",
+      "Vite",
+      "Firebase",
+      "Vercel"
+    ],
+    "live_url": "https://emnlabs.io",
+    "summary": "Personal portfolio and EMN Labs showcase site."
+  }
+]

@@ -15,7 +15,7 @@ the actual project folders live here on disk but are **never tracked** (deny-all
 
 ## Buckets (all gitignored)
 - `personal-projects/` — Qari, qari-assets, emnlabs_site
-- `freelance-projects/` — art_is_everywear (hidden from public catalog until live)
+- `freelance-projects/` — private client work (gitignored; omitted from the public catalog until live)
 - `pocs/` — bil-app
 
 ## Catalog is generated, never hand-edited

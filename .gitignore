@@ -24,6 +24,8 @@
 !/hooks/**
 !/claude-output-docs/
 !/claude-output-docs/**
+!/scripts/
+!/scripts/**
 # Hard re-exclusions (never track even if allowlisted)
 .DS_Store
 **/.git
