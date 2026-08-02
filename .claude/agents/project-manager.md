@@ -101,7 +101,7 @@ Format:
 
 ## TRIGGER 2 — Status request
 
-Invoke: "status" / /sprint-status
+Invoke: "status" / "sprint status"
 
 1. Read all `docs/status/` files
 2. Read all `docs/` for current state
@@ -121,7 +121,7 @@ Invoke: "add to backlog: [task] for [project] P[0-2]"
 
 ## TRIGGER 4 — Retrieve backlog
 
-Invoke: /backlog or "show backlog"
+Invoke: "show backlog"
 
 1. Read `docs/backlog/master-backlog.md`
 2. Format and send via the configured channel (if any)

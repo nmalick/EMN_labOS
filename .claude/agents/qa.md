@@ -107,9 +107,9 @@ ACCESSIBILITY DETAIL
 
 REVISION INSTRUCTIONS (only if NO-SHIP)
 
-→ @agent-pm must fix: [specific items]
+→ PM/owner must fix: [specific items]
 
-→ @agent-designer must fix: [specific items]
+→ Owner must fix: [specific items]
 
 → @agent-frontend-eng must fix: [specific items]
 
