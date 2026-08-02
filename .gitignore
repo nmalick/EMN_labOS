@@ -26,16 +26,27 @@
 !/claude-output-docs/**
 !/scripts/
 !/scripts/**
+!/home-claude/
+!/home-claude/**
+!/manifest.sh
 # Hard re-exclusions (never track even if allowlisted)
 .DS_Store
 **/.git
 **/node_modules/
+**/__pycache__/
 .env*
 **/.vercel/
 *.bundle
+# Agent worktrees live under .claude/, which is allowlisted above — re-exclude
+# them or every future worktree shows up as untracked forever.
+.claude/worktrees/
 # Per-machine Claude overrides (local paths; never publish)
 .claude/settings.local.json
 **/settings.local.json
+# Private clone manifest (freelance/client repos kept out of the public umbrella)
+/manifest.local.sh
+# Private config snapshot (CLAUDE.md/memory naming work orgs — never published)
+/home-claude.local/
 .claude/**/*.lock
 # Gitlink guard: never embed a project repo
 /personal-projects/

@@ -1,6 +1,21 @@
 #!/bin/sh
-# EMN_labOS identity guard — enforce active gh account + personal authorship on outgoing commits.
-[ "$(gh api user --jq .login 2>/dev/null)" = "nmalick" ] || { echo "BLOCKED: active gh != nmalick"; exit 1; }
-bad="$(git log --format='%ae' @{push}..HEAD 2>/dev/null | grep -v '^nmalicksn@gmail.com$' | sort -u)"
-[ -z "$bad" ] || { echo "BLOCKED: non-personal authors: $bad"; exit 1; }
+# EMN_labOS identity guard — profile-aware active-gh account + author check on outgoing commits.
+#   Work     (JourneyOS / Yaqeen)   -> gh nmalick-yaqeen, authors malick.ndiaye@yaqeeninstitute.org
+#   Personal (EMN_labOS / else)      -> gh nmalick,        authors nmalicksn@gmail.com
+toplevel=$(git rev-parse --show-toplevel 2>/dev/null)
+remote=$(git remote get-url origin 2>/dev/null)
+# Each profile also accepts its OWN GitHub noreply form. Merge commits made via
+# the web UI carry it, so matching only the canonical address blocked any branch
+# that had merged main. Profiles never accept each other's — the wall holds.
+if printf '%s\n%s\n' "$remote" "$toplevel" | grep -qiE 'yaqeen-institute|/YaqeenProjects/'; then
+  PROFILE=work; EXPECTED_GH="nmalick-yaqeen"; EXPECTED_EMAIL="malick.ndiaye@yaqeeninstitute.org"
+  NOREPLY="162506402+nmalick-yaqeen@users.noreply.github.com"
+else
+  PROFILE=personal; EXPECTED_GH="nmalick"; EXPECTED_EMAIL="nmalicksn@gmail.com"
+  NOREPLY="7064315+nmalick@users.noreply.github.com"
+fi
+
+[ "$(gh api user --jq .login 2>/dev/null)" = "$EXPECTED_GH" ] || { echo "BLOCKED [$PROFILE]: active gh != $EXPECTED_GH"; exit 1; }
+bad="$(git log --format='%ae' @{push}..HEAD 2>/dev/null | grep -v "^${EXPECTED_EMAIL}$" | grep -v "^${NOREPLY}$" | sort -u)"
+[ -z "$bad" ] || { echo "BLOCKED [$PROFILE]: authors != $EXPECTED_EMAIL: $bad"; exit 1; }
 exit 0
