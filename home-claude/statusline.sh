@@ -179,7 +179,13 @@ accounts_path = sys.argv[3] if len(sys.argv) > 3 else ''
 if accounts_path and os.path.exists(accounts_path):
     try:
         accounts = json.load(open(accounts_path))
-        acct_config = accounts.get(uuid, {})
+        # Prefer an exact account-UUID match. Snapshots published to the public
+        # umbrella repo are keyed by label instead — the UUID is a stable
+        # personal identifier and does not belong in a public repo — so fall
+        # back to the sole entry whenever there is exactly one.
+        acct_config = accounts.get(uuid) or (
+            next(iter(accounts.values())) if len(accounts) == 1 else {}
+        )
     except Exception:
         pass
 

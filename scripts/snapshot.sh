@@ -44,7 +44,11 @@ open(sys.argv[2], "a").write("\n")
 PY
 fi
 
-# mcp-accounts.json: keep ONLY the Personal group (honor the JourneyOS hard wall)
+# mcp-accounts.json: keep ONLY the Personal group (honor the JourneyOS hard wall),
+# and re-key by label. The live file is keyed by Anthropic account UUID — a stable
+# personal identifier that must not reach a public repo. statusline.sh tries an
+# exact UUID match first and falls back to the sole entry, so a label-keyed file
+# works unchanged on any machine or account.
 if [ -f "$SRC/mcp-accounts.json" ] && command -v python3 >/dev/null 2>&1; then
   python3 - "$SRC/mcp-accounts.json" "$STAGE/mcp-accounts.json" <<'PY'
 import json, sys
@@ -52,8 +56,14 @@ try:
     d = json.load(open(sys.argv[1]))
 except Exception:
     d = {}
-keep = {k: v for k, v in d.items() if str(v.get("label", "")).lower() == "personal"}
-json.dump(keep, open(sys.argv[2], "w"), indent=2)
+keep = [v for v in d.values() if str(v.get("label", "")).lower() == "personal"]
+out = {}
+for i, v in enumerate(keep):
+    key = str(v.get("label", "account")).lower() or "account"
+    if i:
+        key = "%s-%d" % (key, i + 1)
+    out[key] = v
+json.dump(out, open(sys.argv[2], "w"), indent=2)
 open(sys.argv[2], "a").write("\n")
 PY
 fi
