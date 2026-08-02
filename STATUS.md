@@ -2,8 +2,9 @@
 
 # Status
 
-_Last generated: 2026-06-29_
+_Last generated: 2026-08-02_
 
 | Project | Bucket | Status | Live |
 |---|---|---|---|
+| Art is Everywear | freelance | live | [https://aubreyorlando.art](https://aubreyorlando.art) |
 | EMN Labs | personal | live | [https://emnlabs.io](https://emnlabs.io) |

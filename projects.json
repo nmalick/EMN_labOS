@@ -1,5 +1,21 @@
 [
   {
+    "name": "Art is Everywear",
+    "slug": "art_is_everywear",
+    "bucket": "freelance",
+    "status": "live",
+    "stack": [
+      "Next.js",
+      "TypeScript",
+      "Tailwind",
+      "Firebase",
+      "Stripe",
+      "Vercel"
+    ],
+    "live_url": "https://aubreyorlando.art",
+    "summary": "Storefront for original artwork and small-batch apparel \u2014 catalog, cart, and Stripe checkout."
+  },
+  {
     "name": "EMN Labs",
     "slug": "emnlabs_site",
     "bucket": "personal",

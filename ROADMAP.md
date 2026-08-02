@@ -2,10 +2,11 @@
 
 # Roadmap
 
-_Last generated: 2026-06-29_
+_Last generated: 2026-08-02_
 
 Public projects grouped by status. Unlaunched/private projects are omitted by design.
 
 ## live
+- Art is Everywear
 - EMN Labs
 

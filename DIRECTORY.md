@@ -28,11 +28,13 @@ On-demand map of the umbrella. Load this when you need to know where something l
 | `/personal-init` | Switch gh→`nmalick`, enforce git identity/hooks, report vercel/npm + connector group. Run each session. |
 | `/labos-replicate` | Fresh-machine bootstrap (curl one-liner) + snapshot/manifest maintenance. |
 
-> Private clone entries live in gitignored `manifest.local.sh` (keeps the freelance client name out of the public repo).
+> Clone entries for repos that must stay out of the public repo go in gitignored `manifest.local.sh`
+> instead of `registry/` (leave that entry's `repo_url` empty). Nothing uses this today — the one
+> freelance project has launched and is catalogued normally — but the path stays open for the next one.
 
 ## Projects (on disk, gitignored)
 | Bucket | Projects |
 |---|---|
 | `personal-projects/` | Qari, qari-assets, emnlabs_site |
-| `freelance-projects/` | _(private; gitignored)_ |
+| `freelance-projects/` | art_is_everywear |
 | `pocs/` | bil-app |

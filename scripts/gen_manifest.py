@@ -6,8 +6,9 @@ Source of truth: registry frontmatter (repo_url + bucket). Reuses catalog_sync's
 Filter: every registry entry that has a non-empty repo_url, regardless of visibility/live_url
 (different from catalog_sync.py, which is default-deny on visibility+live_url for PUBLIC surfaces).
 
-The private freelance entry has no repo_url in the registry by design, so it is excluded here;
-it lives in the gitignored manifest.local.sh instead. Stdlib only.
+A repo that must not appear in the tracked manifest.sh should leave repo_url empty in its registry
+entry and carry its clone line in the gitignored manifest.local.sh, which bootstrap.sh also sources.
+No entry needs that today. Stdlib only.
 """
 import os
 from catalog_sync import load_registry, ROOT  # reuse the existing frontmatter parser

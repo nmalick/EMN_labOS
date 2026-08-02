@@ -2,6 +2,7 @@
 
 # Release notes
 
-_Last generated: 2026-06-29_
+_Last generated: 2026-08-02_
 
+- **Art is Everywear** — live at [https://aubreyorlando.art](https://aubreyorlando.art).
 - **EMN Labs** — live at [https://emnlabs.io](https://emnlabs.io).

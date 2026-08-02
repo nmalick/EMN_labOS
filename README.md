@@ -4,10 +4,11 @@
 
 Personal umbrella OS for Malick Ndiaye's projects. The catalog below is generated from `registry/` and lists only projects that are public **and** live.
 
-_Last generated: 2026-06-29_
+_Last generated: 2026-08-02_
 
 ## Projects
 
 | Project | Summary | Stack | Live |
 |---|---|---|---|
+| Art is Everywear | Storefront for original artwork and small-batch apparel — catalog, cart, and Stripe checkout. | Next.js, TypeScript, Tailwind, Firebase, Stripe, Vercel | [https://aubreyorlando.art](https://aubreyorlando.art) |
 | EMN Labs | Personal portfolio and EMN Labs showcase site. | React, Vite, Firebase, Vercel | [https://emnlabs.io](https://emnlabs.io) |
