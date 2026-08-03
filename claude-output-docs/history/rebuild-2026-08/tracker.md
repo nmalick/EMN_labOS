@@ -36,6 +36,9 @@
 | 2.6a | 2 | Pages + metadata + push protection | ✅ | — | Pages live at nmalick.github.io/EMN_labOS (serves pre-rebuild docs from main until merge — recap note); push protection on both public repos |
 | 2.6b | 2.6 | Fleet built (checker before maker) | ✅ | `3a09a21` | 3 reference skills + repo-recon/doc-verifier (haiku) + repo-auditor/reviewer (opus) + /baseline-audit with per-halt flags. Wall blocked the fleet's own commit once (literal reference path) — reworded, by design |
 | 2.6c | 2.6 | Dry run: recon + kit + branches + verify-baseline | ✅ | — | Recon receipt OK (custom agent types register at session start — fallback: general-purpose + inline contract, recorded for Phase 3). Kit installed (public-safe rules). 8 local branches deleted (all 0-ahead; 7 remote refs → recap deferred-cleanup). Worktree pruned. VERIFY_CMD false-RED found + contract corrected (-I volatile fields) + Past-learning block written |
+| 2.6d | 2.6 | Audits + blind verification | ✅ | qari-assets branch | Engineering 93 claims/0 inferred; history 151 claims/11 Inferred (promotion gate holds IN_PROGRESS pending owner review); blind verify: 392 citation lines, 0 missing/uncited. Real finds: manifest pins one tag behind latest release; workflow comment contradicts tag reality; README inventory incomplete; **KFGQPC charitable-use clause exists only in font name-tables → ACTION-REQUIRED** |
+| 2.6e | 2.6 | Reviewer gate — 2× NO-SHIP, both correct | ✅ | rewritten range | R1 BLOCKING: my own 1.3 commit tracked the work-tree deny path into the PUBLIC repo (mechanical layers structurally can't catch it — the judgment layer did). Fixed by pre-push history rewrite; deny → settings.local.json. R2 BLOCKING: my rewrite orphaned a cited SHA (exists-but-unreachable — verifier's existence-only check passed it) + router CLAUDE.md still published the naive false-RED verify cmd. All fixed; doc-verifier contract gained the reachability check (`f3bc58c`). Delta re-review in flight |
+| 2.7 | 2 | Reference playbooks committed | ✅ | `943e183` | 3 sanitized docs, token-scan clean (writer #2 died at spend limit mid-trim — files were complete on disk) |
 | 1.11 | 1 | Hook-effectiveness canary | ✅ | — | Work token staged outside `.labos-allow` → BLOCKED by new hook (public-repo guard proven live); worktree-config layering fixed | 
 | 1.10 | 1 | Snapshot + public-surface shrink | ✅ | `6cea198` | 4-file public snapshot; Telegram/SOXLA agent copies GONE from public repo; guard green (work+client classes); local half synced not destroyed. Note: `/doctor` is an interactive-CLI dialog — equivalent checks done (JSON validity, hook matrix, guard); interactive run listed in ACTION-REQUIRED |
 
@@ -55,6 +58,9 @@
 | D-1 | ACTION-REQUIRED | Qari PR #69 merge decision (nastaleeq fix — 1 unique commit) | Phase 0 PR enum |
 | D-2 | ACTION-REQUIRED | art PR #16 merge decision (firebase security-rule auto-deploy — 1 unique commit) | Phase 0 PR enum |
 | D-3 | DEBT (dated 2026-08-02) | Work eviction from global — execute from a work session; detail at JourneyOS `.claude-work/plans/global-work-eviction.md` | Phase 1.9 |
+| D-5 | ACTION-REQUIRED | qari-assets: KFGQPC charitable-use/no-print clause lives only in commit f614411 + font name-tables — promote to a repo-level license note before more public visibility? | Dry-run history audit |
+| D-6 | ACTION-REQUIRED | qari-assets: was a GitHub Release ever published for tag qari-assets-4 (tag exists, workflow comment says never cut)? | Dry-run audits |
+| D-7 | DECISION (11 items) | qari-assets history/CHANGELOG: 11 `Inferred — needs review` markers (4 backfilled decisions + 7 reconstructed release sections) — owner review promotes IN_PROGRESS → READY | Promotion gate |
 | D-4 | ACTION-REQUIRED | Run interactive `/doctor` once in a fresh session (dialog command — not invocable unattended) | Phase 1 gate |
 
 ## Debt register
