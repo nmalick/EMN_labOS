@@ -4,6 +4,7 @@ slug: bil-app
 bucket: poc
 visibility: public
 status: poc
+showcase: true
 live_url:
 repo_url: https://github.com/nmalick/bil-app
 repo_public: false
