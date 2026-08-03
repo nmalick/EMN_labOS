@@ -2,6 +2,7 @@
 
 _Current focus. Keep short._
 
-- Migration closed (2026-08-02). Umbrella is the working root; buckets placed, catalog generated.
-- Fresh-machine replication ready — `/labos-replicate` to bootstrap, `/personal-init` each session.
+- **2026-08 rebuild in progress** — doc baselines + identity wall + showcase v2.
+  Live status: [tracker](claude-output-docs/history/rebuild-2026-08/tracker.md).
+- Fresh-machine replication: `/labos-replicate` (restore-test re-certification pending Phase 5).
 - Active project work: Qari. Per-project state in [STATUS.md](STATUS.md).
