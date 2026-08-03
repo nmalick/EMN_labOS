@@ -21,3 +21,15 @@ Rules:
   obviously doesn't exist. (Cheap pass only — the blind verifier does the real check.)
 - Verifier judgment tolerances: line drift ±5 lines with matching content = `LINE_DRIFT`
   (non-blocking); missing file or missing symbol = blocking FAIL.
+
+## Evidence-class suffixes (multi-branch history)
+
+When a doc cites commits from more than one reachability class, EVERY auditor writing ANY
+surface must use the suffix — not just the history auditor:
+- reachable from origin/main → no suffix (default)
+- reachable only from a local archive tag → `commit <sha> (archive-tag evidence, local-only)`
+- reachable only from the integration branch → `commit <sha> (rebuild-branch evidence)`
+The blind verifier classifies suffixed lines as documented-unreachable; an unsuffixed
+non-main SHA is a FAIL. Orchestrators: pass the suffix rule to product/ops/analytics auditors
+too whenever a repo has rescued/pre-reset history, or they emit it clean and the verifier
+fails the whole set on a mechanical gap.

@@ -7,7 +7,7 @@ owner: Malick
 created: 2026-08-02
 updated: 2026-08-02
 last_verified: 2026-08-02
-verified_against: `n/a (external references)`
+verified_against: n/a (external references)
 ttl_days: 365
 confidence: confirmed
 ---

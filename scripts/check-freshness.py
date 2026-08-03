@@ -86,11 +86,16 @@ def main():
                     if not os.path.exists(target):
                         findings.append(f"SOURCE_MISSING {p} -> {src}")
                 va = meta.get("verified_against", "")
-                if va:
+                # Only SHA-shaped verified_against values are git-checkable. Reference docs
+                # that verify against external sources use a sentinel (e.g. "n/a (external
+                # references)") and are exempt from the ancestry check by design.
+                if va and re.fullmatch(r"[0-9a-f]{7,40}", va):
                     r = subprocess.run(["git", "-C", repo, "merge-base", "--is-ancestor", va, "origin/main"],
                                        capture_output=True)
                     if r.returncode not in (0,):
                         findings.append(f"STALE_BASE     {p} (verified_against {va[:12]} not an ancestor of origin/main)")
+                elif va and not va.lower().startswith("n/a"):
+                    findings.append(f"BAD_BASE       {p} (verified_against {va[:20]!r} is neither a SHA nor an 'n/a' sentinel)")
 
     print(f"check-freshness: {checked} tracked doc(s), {untracked} untracked, {len(findings)} finding(s).")
     for f in findings:
