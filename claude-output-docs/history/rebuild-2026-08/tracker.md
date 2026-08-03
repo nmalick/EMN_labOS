@@ -58,7 +58,9 @@
 | 3.13 | 3 | emnlabs T1 pass (direct) | ✅ | ae9c76f..e438f8e | 5 items, 5 commits, build green each: del initiatives.js (dead) + _old_backup/ (16), 7 no-unused-vars cleared, 7 console.log breadcrumbs removed, 5 seed-fixtures headered. eslint 15→7 err (residual = Node-ctx scripts + ArticleDetail) |
 | 3.14 | 3 | emnlabs T2 (live-bug + env var) | ✅ | `31e20d6` + `c6b9853` | **Fixed the live /field-notes/:id crash** (getProjectById no-undef → allInitiatives lookup, not the dead stub); FRIDAY_MODEL env override. T2-01/T2-03 deferred (T2-03 blocked on CORS origin-list decision D-15) |
 | 3.15 | 3 | emnlabs reconciliation + hygiene + tag | ✅ | `fbf9be4` + tag | README rewrite; APFS case-collision resolved (FEATURES→features-legacy, supersede+rename); package name fixed; scripts destructive-seed warning; superseded_by ×1; branch 3→2 (clean post-reset); baseline-2026-08 tagged |
-| 3.16 | 3 | emnlabs reviewer gate | ▶ | — | running |
+| 3.16 | 3 | emnlabs reviewer + PR | ✅ | **[PR #2](https://github.com/nmalick/emnlabs_site/pull/2)** | SHIP-WITH-NOTES; live /field-notes bug fixed; tag pushed |
+| 3.17 | 3 | bil-app baseline | ⏳ next | — | recon → kit → audit → fix → PR |
+| 3.18 | 3 | art_is_everywear baseline | ⏳ | — | full baseline from origin/main (41 commits); code stays at root |
 | 1.11 | 1 | Hook-effectiveness canary | ✅ | — | Work token staged outside `.labos-allow` → BLOCKED by new hook (public-repo guard proven live); worktree-config layering fixed | 
 | 1.10 | 1 | Snapshot + public-surface shrink | ✅ | `6cea198` | 4-file public snapshot; Telegram/SOXLA agent copies GONE from public repo; guard green (work+client classes); local half synced not destroyed. Note: `/doctor` is an interactive-CLI dialog — equivalent checks done (JSON validity, hook matrix, guard); interactive run listed in ACTION-REQUIRED |
 
