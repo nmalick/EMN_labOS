@@ -40,3 +40,9 @@ decisions log and continue with the next step that doesn't depend on it.
 > equals the target project's root. The dry run pushed the wrong repo's branch and opened a PR
 > with the wrong body because a prior command had reset the shell cwd to the umbrella worktree.
 > Every push/PR block now starts with the toplevel assertion.
+
+> **Past learning (2026-08):** archive-tag pushes FAIL the pre-push author sweep when the
+> archived branch's historical commits carry legacy/automation authors — that is the wall
+> working, not a bug. Rule amendment: tags for legacy-authored history stay LOCAL-ONLY; the
+> Phase-0 `--all` bundle is the offsite copy; history-doc recover pointers must carry the
+> local-only caveat.
