@@ -1,21 +1,96 @@
 #!/bin/sh
-# EMN_labOS identity guard — profile-aware active-gh account + author check on outgoing commits.
-#   Work     (JourneyOS / Yaqeen)   -> gh nmalick-yaqeen, authors malick.ndiaye@yaqeeninstitute.org
-#   Personal (EMN_labOS / else)      -> gh nmalick,        authors nmalicksn@gmail.com
+# EMN_labOS identity guard — profile-aware gh-account + author + secret check on OUTGOING commits.
+# Logic is public; identifiers/patterns live in gitignored hooks/identities.local.
+# Reads the ref quadruples from stdin so the FIRST push of a new branch is verified too
+# (the old @{push} form silently skipped exactly that case). Each profile accepts its own
+# GitHub noreply form (web-UI merge commits carry it); profiles never accept each other's.
+# Escape hatch for unrelated repos: git config labos.profile none
+
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+IDF="$HOOK_DIR/identities.local"
+if [ ! -f "$IDF" ]; then
+  echo "BLOCKED: $IDF missing — the identity wall cannot run without it." >&2
+  exit 1
+fi
+. "$IDF"
+
+[ "$(git config labos.profile 2>/dev/null)" = "none" ] && exit 0
+
 toplevel=$(git rev-parse --show-toplevel 2>/dev/null)
 remote=$(git remote get-url origin 2>/dev/null)
-# Each profile also accepts its OWN GitHub noreply form. Merge commits made via
-# the web UI carry it, so matching only the canonical address blocked any branch
-# that had merged main. Profiles never accept each other's — the wall holds.
-if printf '%s\n%s\n' "$remote" "$toplevel" | grep -qiE 'yaqeen-institute|/YaqeenProjects/'; then
-  PROFILE=work; EXPECTED_GH="nmalick-yaqeen"; EXPECTED_EMAIL="malick.ndiaye@yaqeeninstitute.org"
-  NOREPLY="162506402+nmalick-yaqeen@users.noreply.github.com"
+if printf '%s\n%s\n' "$remote" "$toplevel" | grep -qiE "$WORK_MATCH_RE"; then
+  PROFILE=work;     EXPECTED_GH="$WORK_GH";     EXPECTED_EMAIL="$WORK_EMAIL";     NOREPLY="$WORK_NOREPLY"
+  SECRET_RE="$SECRET_RE_COMMON"
 else
-  PROFILE=personal; EXPECTED_GH="nmalick"; EXPECTED_EMAIL="nmalicksn@gmail.com"
-  NOREPLY="7064315+nmalick@users.noreply.github.com"
+  PROFILE=personal; EXPECTED_GH="$PERSONAL_GH"; EXPECTED_EMAIL="$PERSONAL_EMAIL"; NOREPLY="$PERSONAL_NOREPLY"
+  SECRET_RE="$SECRET_RE_COMMON|$PERSONAL_EXTRA_RE"
 fi
 
-[ "$(gh api user --jq .login 2>/dev/null)" = "$EXPECTED_GH" ] || { echo "BLOCKED [$PROFILE]: active gh != $EXPECTED_GH"; exit 1; }
-bad="$(git log --format='%ae' @{push}..HEAD 2>/dev/null | grep -v "^${EXPECTED_EMAIL}$" | grep -v "^${NOREPLY}$" | sort -u)"
-[ -z "$bad" ] || { echo "BLOCKED [$PROFILE]: authors != $EXPECTED_EMAIL: $bad"; exit 1; }
-exit 0
+# gh resolution: absolute path first (GUI clients run hooks without a login shell,
+# so /opt/homebrew/bin is off PATH there). Distinguish "gh unavailable" from
+# "wrong account" — the former trains people toward --no-verify if misreported.
+GH_BIN=""
+for c in /opt/homebrew/bin/gh /usr/local/bin/gh gh; do
+  command -v "$c" >/dev/null 2>&1 && { GH_BIN="$c"; break; }
+done
+if [ -z "$GH_BIN" ]; then
+  echo "BLOCKED [$PROFILE]: gh CLI not found (PATH issue — GUI client?). Cannot verify the active" >&2
+  echo "  GitHub account. Push from a terminal, or fix the hook's gh path. NOT an account mismatch." >&2
+  exit 1
+fi
+ACTIVE_GH="$("$GH_BIN" api user --jq .login 2>/dev/null)"
+if [ -z "$ACTIVE_GH" ]; then
+  echo "BLOCKED [$PROFILE]: gh is present but returned no login (auth expired / offline)." >&2
+  echo "  Run: $GH_BIN auth status   — NOT an account mismatch." >&2
+  exit 1
+fi
+[ "$ACTIVE_GH" = "$EXPECTED_GH" ] || { echo "BLOCKED [$PROFILE]: active gh account = $ACTIVE_GH, expected $EXPECTED_GH (gh auth switch)." >&2; exit 1; }
+
+ALLOW_LOCAL="$HOOK_DIR/allowlist.local"
+path_in_list() {
+  [ -f "$2" ] || return 1
+  while IFS= read -r line; do
+    case "$line" in ''|'#'*) continue ;; esac
+    case "$1" in "$line"*) return 0 ;; esac
+  done < "$2"
+  return 1
+}
+
+ZERO="0000000000000000000000000000000000000000"
+status=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -n "$local_sha" ] || continue
+  [ "$local_sha" = "$ZERO" ] && continue   # deletion push — nothing outgoing to scan
+  if [ "$remote_sha" = "$ZERO" ]; then
+    range_list="$(git rev-list "$local_sha" --not --remotes=origin 2>/dev/null)"
+  else
+    range_list="$(git rev-list "$remote_sha..$local_sha" 2>/dev/null)"
+  fi
+  [ -n "$range_list" ] || continue
+
+  # Author sweep over every outgoing commit.
+  bad="$(printf '%s\n' "$range_list" | while read -r c; do git log -1 --format='%ae' "$c"; done \
+        | grep -v "^${EXPECTED_EMAIL}$" | grep -v "^${NOREPLY}$" | sort -u)"
+  if [ -n "$bad" ]; then
+    echo "BLOCKED [$PROFILE]: outgoing commits carry unexpected author(s): $bad" >&2
+    status=1; continue
+  fi
+
+  # Secret sweep over the files as they stand at the pushed tip (merge/rebase/cherry-pick
+  # never fire pre-commit — this is the backstop). .gitignore exempt, allowlist honored.
+  if [ "$remote_sha" = "$ZERO" ]; then
+    changed="$(git diff --name-only --diff-filter=ACMR "$(git merge-base "$local_sha" "$(git rev-parse origin/HEAD 2>/dev/null || echo "$local_sha")" 2>/dev/null || echo "$local_sha^" 2>/dev/null)" "$local_sha" 2>/dev/null || git ls-tree -r --name-only "$local_sha")"
+  else
+    changed="$(git diff --name-only --diff-filter=ACMR "$remote_sha" "$local_sha")"
+  fi
+  printf '%s\n' "$changed" | while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    case "${f##*/}" in .gitignore) continue ;; esac
+    path_in_list "$f" "$ALLOW_LOCAL" && continue
+    if git show "$local_sha:$f" 2>/dev/null | grep -qIE "$SECRET_RE"; then
+      echo "BLOCKED [$PROFILE]: secret-shaped content in outgoing blob: $f @ ${local_sha%??????????????????????????????????}" >&2
+      echo 1
+    fi
+  done | grep -q 1 && status=1
+done
+exit $status

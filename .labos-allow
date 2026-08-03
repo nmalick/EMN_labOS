@@ -1,0 +1,20 @@
+# Paths exempt from the labOS public-repo token scan (hooks/pre-commit).
+# These files legitimately DESCRIBE the identity wall or carry user-approved public
+# fields (the client's live_url). Adding a path here is a reviewer-gated change.
+hooks/
+scripts/snapshot.sh
+scripts/catalog_sync.py
+scripts/personal-init.sh
+scripts/bootstrap.sh
+CLAUDE.md
+DIRECTORY.md
+registry/
+README.md
+STATUS.md
+ROADMAP.md
+RELEASE-NOTES.md
+projects.json
+manifest.sh
+docs/
+.claude/settings.json
+claude-output-docs/history/rebuild-2026-08/

@@ -29,7 +29,9 @@
 !/home-claude/
 !/home-claude/**
 !/manifest.sh
+!/.labos-allow
 # Hard re-exclusions (never track even if allowlisted)
+/hooks/*.local
 .DS_Store
 **/.git
 **/node_modules/

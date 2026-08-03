@@ -1,31 +1,81 @@
 #!/bin/sh
-# EMN_labOS identity guard — profile-aware.
-#   Work    (JourneyOS / Yaqeen: origin on yaqeen-institute, or path under ~/YaqeenProjects)
-#           -> author malick.ndiaye@yaqeeninstitute.org; work-email allowed in content.
-#   Personal (EMN_labOS / everything else)
-#           -> author nmalicksn@gmail.com; work-email treated as a leak and blocked.
-# Both profiles block private keys / service-account / firebase-adminsdk secrets.
+# EMN_labOS identity guard — profile-aware, data-driven.
+# Logic is public; identifiers/patterns live in gitignored hooks/identities.local.
+#   Work profile:     work author expected; work-domain content allowed.
+#   Personal profile: personal author expected; work-domain content treated as a leak.
+# Both profiles block secret-shaped content in STAGED BLOBS (scans the index, not the
+# worktree). .gitignore files are exempt from content scans — they name secret-file
+# patterns by design. Escape hatch for unrelated repos: git config labos.profile none
+
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+IDF="$HOOK_DIR/identities.local"
+if [ ! -f "$IDF" ]; then
+  echo "BLOCKED: $IDF missing — the identity wall cannot run without it." >&2
+  echo "         Restore it from the machine archive or recreate per hooks/README." >&2
+  exit 1
+fi
+. "$IDF"
+
+[ "$(git config labos.profile 2>/dev/null)" = "none" ] && exit 0
 
 toplevel=$(git rev-parse --show-toplevel 2>/dev/null)
 remote=$(git remote get-url origin 2>/dev/null)
-if printf '%s\n%s\n' "$remote" "$toplevel" | grep -qiE 'yaqeen-institute|/YaqeenProjects/'; then
-  PROFILE=work
-  EXPECTED="malick.ndiaye@yaqeeninstitute.org"
-  SECRET_RE='BEGIN (RSA |EC )?PRIVATE KEY|serviceAccount|firebase-adminsdk'
+if printf '%s\n%s\n' "$remote" "$toplevel" | grep -qiE "$WORK_MATCH_RE"; then
+  PROFILE=work;     EXPECTED="$WORK_EMAIL";     SECRET_RE="$SECRET_RE_COMMON"
 else
-  PROFILE=personal
-  EXPECTED="nmalicksn@gmail.com"
-  SECRET_RE='BEGIN (RSA |EC )?PRIVATE KEY|yaqeeninstitute\.org|serviceAccount|firebase-adminsdk'
+  PROFILE=personal; EXPECTED="$PERSONAL_EMAIL"; SECRET_RE="$SECRET_RE_COMMON|$PERSONAL_EXTRA_RE"
 fi
 
-[ "$(git config user.email)" = "$EXPECTED" ] || { echo "BLOCKED [$PROFILE]: author != $EXPECTED"; exit 1; }
+# Author check — config AND effective ident (catches GIT_AUTHOR_EMAIL= laundering).
+[ "$(git config user.email)" = "$EXPECTED" ] || { echo "BLOCKED [$PROFILE]: git config user.email != $EXPECTED" >&2; exit 1; }
+case "$(git var GIT_AUTHOR_IDENT 2>/dev/null)" in
+  *"<$EXPECTED>"*) : ;;
+  *) echo "BLOCKED [$PROFILE]: effective author ident != $EXPECTED (env override?)" >&2; exit 1 ;;
+esac
 
-# Scan staged additions for secrets (+ work-email leak on personal). Exclude hooks/ — it defines these patterns by design.
-files=$(git diff --cached --name-only --diff-filter=ACM | grep -v '^hooks/')
-if [ -n "$files" ]; then
-  hits=$(printf '%s\n' "$files" | tr '\n' '\0' | xargs -0 grep -lEI "$SECRET_RE" 2>/dev/null)
-  if [ -n "$hits" ]; then
-    echo "BLOCKED [$PROFILE]: secret/disallowed content in staged files:"; echo "$hits"; exit 1
+# identities.local must never be staged, anywhere.
+if git diff --cached --name-only -z | tr '\0' '\n' | grep -qE '(^|/)identities\.local$'; then
+  echo "BLOCKED [$PROFILE]: hooks/identities.local is staged — it is machine-local by design." >&2
+  exit 1
+fi
+
+# Is this the labOS public repo (primary checkout or one of its worktrees)?
+IS_LABOS=0
+printf '%s' "$toplevel" | grep -qE "$LABOS_ROOT_RE" && IS_LABOS=1
+
+ALLOW_LOCAL="$HOOK_DIR/allowlist.local"     # machine-local per-path exceptions
+LABOS_ALLOW="$toplevel/.labos-allow"        # tracked: paths that legitimately describe the wall
+
+path_in_list() { # $1=path $2=listfile — prefix match per line; comments/blank skipped
+  [ -f "$2" ] || return 1
+  while IFS= read -r line; do
+    case "$line" in ''|'#'*) continue ;; esac
+    case "$1" in "$line"*) return 0 ;; esac
+  done < "$2"
+  return 1
+}
+
+tmpfail="$(mktemp)"; : > "$tmpfail"
+git diff --cached --name-only -z --diff-filter=ACMR | tr '\0' '\n' | while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  path_in_list "$f" "$ALLOW_LOCAL" && continue
+  base="${f##*/}"
+  # Secret scan (index blob, not worktree). .gitignore exempt by design.
+  if [ "$base" != ".gitignore" ]; then
+    if git show ":$f" 2>/dev/null | grep -qIE "$SECRET_RE"; then
+      echo "BLOCKED [$PROFILE]: secret-shaped content in staged blob: $f" >&2
+      echo 1 >> "$tmpfail"
+    fi
   fi
-fi
+  # labOS public-repo token scan.
+  if [ "$IS_LABOS" = "1" ] && ! path_in_list "$f" "$LABOS_ALLOW"; then
+    if git show ":$f" 2>/dev/null | grep -qiIE "$LABOS_COMMIT_TOKENS"; then
+      echo "BLOCKED [labos-public]: work/client token in staged blob: $f" >&2
+      echo "  (If this file legitimately describes the wall, add its path to .labos-allow — reviewer-gated.)" >&2
+      echo 1 >> "$tmpfail"
+    fi
+  fi
+done
+if [ -s "$tmpfail" ]; then rm -f "$tmpfail"; exit 1; fi
+rm -f "$tmpfail"
 exit 0
