@@ -17,14 +17,25 @@
 | 0.5 | 0 | Assertions | ✅ | — | gh=`nmalick` · `CLAUDE_CODE_SUBAGENT_MODEL` UNSET |
 | 0.5b | 0 | Open-PR enumeration | ✅ | — | Qari #69 (`claude/nastaleeq-font-and-pagination`), art #16 (`claude/firebase-setup-scope-rkr9y8`) — both heads **PROTECTED** |
 | 0.6 | 0 | Registry quick-fixes | ✅ | `030d323` | art summary/stack (checkout-era claims removed), Qari stack (Riverpod dropped), showcase flags ×3 |
-| 0.7 | 0 | Tracker + baseline + memory | ✅ | this commit | — |
+| 0.7 | 0 | Tracker + baseline + memory | ✅ | `c781b4d` | — |
+| 1.1 | 1 | snapshot.sh hardened | ✅ | `c64a5d8` | Allowlist synthesis, no `rm -rf` of local half, worktree guard + override, CLIENT_TOKENS |
+| 1.2 | 1 | PostHog spike | ✅ | — | Project-scope `enabledPlugins:false` documented valid; project beats user (moderate confidence — Phase 5 fresh-session check confirms; fallback = eviction hand-off item 2) |
+| 1.3 | 1 | Project settings ×6 + .gitignore guards | ✅ | Qari `f777069` · emnlabs `62aa626` · qari-assets `f7a4f60` · art `0f0ce7b` · bil `fef6974` · umbrella `e0d5c3d` | emnlabs commit was BLOCKED by the OLD hook (false positive on `.gitignore` naming service-account file patterns) — deferred until 1.7, then passed by design, never `--no-verify`. Qari `settings.local.json` ×2 purged (CascadeProjects paths) + simulator grants relocated |
+| 1.4 | 1 | Global settings surgery | ✅ | — | 15 stale entries removed (UDID, mushaf paths, dead `~/.claude-work` fragment, blanket home Read, `gh pr:*`); `additionalDirectories` = run-scoped 3 paths (final narrowing in Phase 5) |
+| 1.5 | 1 | Global CLAUDE.md | ✅ | — | Model-policy contradiction resolved keep-Opus direction; tiering table; LLMA env-var prohibition; work-leaning scope line |
+| 1.6 | 1 | Archive + delete personal residue | ✅ | — | agent-memory 9 files archived+deleted (verified identical first); plans: 15 work stay (incl. 2 boundary-referencing migration plans — conservative), 1 personal archived, executing plan PROTECTED; 5 global agents archived+deleted |
+| 1.7 | 1 | Hooks hardening | ✅ | `c64a5d8` | identities.local (gitignored, staged-block asserted) + `.labos-allow`; scratch matrix 6/6; self-test commit passed; pre-push first-push hole closed + secret backstop |
+| 1.8 | 1 | includeIf + smoke tests | ✅ | — | `gitdir/i:~/YaqeenProjects/**` after `[user]`; SMOKE B: virgin repo under YaqeenProjects resolves work email + passes work-profile hook; SMOKE C: JourneyOS resolves work email; personal profile proven by all run commits. Revert: delete includeIf block + `~/.gitconfig-work` |
+| 1.9 | 1 | Eviction hand-off | ✅ | `6cea198` (stub) | Detail → JourneyOS `.claude-work/plans/global-work-eviction.md` (gitignored, repo untouched); pointer stub in umbrella |
+| 1.10 | 1 | Snapshot + public-surface shrink | ✅ | `6cea198` | 4-file public snapshot; Telegram/SOXLA agent copies GONE from public repo; guard green (work+client classes); local half synced not destroyed. Note: `/doctor` is an interactive-CLI dialog — equivalent checks done (JSON validity, hook matrix, guard); interactive run listed in ACTION-REQUIRED |
 
 ## Config changes ledger (pre/post + revert one-liners)
 
 | When | Change | Revert |
 |---|---|---|
 | P0 | Umbrella worktree branch `claude/emn-journey-os-architecture-10cda1` → `rebuild/2026-08` | `git checkout claude/emn-journey-os-architecture-10cda1` |
-| (pending P1) | `core.hooksPath` → rebuild-branch checkout | `git config --global core.hooksPath /Users/malick/EMN_labOS/hooks` |
+| P1 | GLOBAL `core.hooksPath` → rebuild-branch checkout | `git config --global core.hooksPath /Users/malick/EMN_labOS/hooks` |
+| P1 | LOCAL umbrella `core.hooksPath` (was relative `hooks` → resolved to primary/main = OLD hooks) → rebuild checkout absolute | `git -C /Users/malick/EMN_labOS config --local core.hooksPath hooks` |
 
 ## Decisions log (T3 + ACTION-REQUIRED accumulator)
 
@@ -32,6 +43,8 @@
 |---|---|---|---|
 | D-1 | ACTION-REQUIRED | Qari PR #69 merge decision (nastaleeq fix — 1 unique commit) | Phase 0 PR enum |
 | D-2 | ACTION-REQUIRED | art PR #16 merge decision (firebase security-rule auto-deploy — 1 unique commit) | Phase 0 PR enum |
+| D-3 | DEBT (dated 2026-08-02) | Work eviction from global — execute from a work session; detail at JourneyOS `.claude-work/plans/global-work-eviction.md` | Phase 1.9 |
+| D-4 | ACTION-REQUIRED | Run interactive `/doctor` once in a fresh session (dialog command — not invocable unattended) | Phase 1 gate |
 
 ## Debt register
 
