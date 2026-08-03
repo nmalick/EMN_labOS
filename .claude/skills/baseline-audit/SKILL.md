@@ -35,3 +35,8 @@ A HALT reached with no substituting flag in an unattended run ⇒ write ESCALATE
 decisions log and continue with the next step that doesn't depend on it.
 
 `--resume <step>`: read the step cursor from the integration branch's last commit trailer.
+
+> **Past learning (2026-08):** before ANY push/PR step, assert `git rev-parse --show-toplevel`
+> equals the target project's root. The dry run pushed the wrong repo's branch and opened a PR
+> with the wrong body because a prior command had reset the shell cwd to the umbrella worktree.
+> Every push/PR block now starts with the toplevel assertion.
