@@ -1,0 +1,47 @@
+{
+  "enabledPlugins": {
+    "posthog@claude-plugins-official": false
+  },
+  "autoMemoryDirectory": "/Users/malick/.claude/projects/-Users-malick-EMN-labOS/memory",
+  "permissions": {
+    "allow": [
+      "Bash(bash scripts/*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(gh api repos/nmalick/*)",
+      "Bash(gh api user:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(git:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(mkdir:*)",
+      "Bash(python3:*)",
+      "Bash(rg:*)",
+      "Bash(rsync:*)"
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Write(**/.env*)",
+      "Edit(**/.env*)",
+      "Read(**/firebase-service-account*.json)",
+      "Write(**/firebase-service-account*.json)",
+      "Edit(**/firebase-service-account*.json)",
+      "Read(**/*.keystore)",
+      "Write(**/*.keystore)",
+      "Edit(**/*.keystore)",
+      "Read(**/*.jks)",
+      "Write(**/*.jks)",
+      "Edit(**/*.jks)",
+      "Read(/Users/malick/YaqeenProjects/**)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr close:*)",
+      "Bash(gh repo delete:*)",
+      "Bash(git push --force:*)"
+    ],
+    "additionalDirectories": [
+      "/Users/malick/EMN_labOS"
+    ]
+  }
+}
