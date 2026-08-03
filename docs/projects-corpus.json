@@ -79,6 +79,24 @@
     }
   },
   {
+    "name": "Opportunity Tool",
+    "slug": "opportunity_tool",
+    "bucket": "personal",
+    "status": "paused",
+    "stack": [
+      "JavaScript",
+      "Vercel"
+    ],
+    "live_url": "https://opportunitytool.vercel.app",
+    "summary": "Opportunity-tracking web tool \u2014 split out of the portfolio site into its own deployment.",
+    "highlights": [],
+    "showcase": true,
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
+  },
+  {
     "name": "qari-assets",
     "slug": "qari-assets",
     "bucket": "personal",

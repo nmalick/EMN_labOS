@@ -14,6 +14,7 @@ _Catalog as of the latest registry change: 2026-08-02_
 | Art is Everywear | Storefront for original artwork and small-batch apparel — made-to-order requests with a Firebase-backed catalog and admin. | Next.js, TypeScript, Tailwind, Firebase, Vercel | [live](https://aubreyorlando.art) |
 | bil-app | Proof-of-concept app (mobile client + backend). | React Native, Expo, Node.js, TypeScript | in development |
 | EMN Labs | Personal portfolio and EMN Labs showcase site. | React, Vite, Firebase, Vercel | [live](https://emnlabs.io) |
+| Opportunity Tool | Opportunity-tracking web tool — split out of the portfolio site into its own deployment. | JavaScript, Vercel | [live](https://opportunitytool.vercel.app) |
 | qari-assets | Quranic fonts and Tajweed typesetting assets consumed by the Qari app. | Fonts, Python | [repo](https://github.com/nmalick/qari-assets) |
 
 ## The OS itself

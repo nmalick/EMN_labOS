@@ -13,6 +13,9 @@ Public projects grouped by status. Private/unlisted projects are omitted by desi
 - Art is Everywear
 - EMN Labs
 
+## paused
+- Opportunity Tool
+
 ## poc
 - bil-app
 

@@ -10,4 +10,5 @@ _As of the latest registry change: 2026-08-02_
 | Art is Everywear | freelance | live | [https://aubreyorlando.art](https://aubreyorlando.art) |
 | bil-app | poc | poc | — |
 | EMN Labs | personal | live | [https://emnlabs.io](https://emnlabs.io) |
+| Opportunity Tool | personal | paused | [https://opportunitytool.vercel.app](https://opportunitytool.vercel.app) |
 | qari-assets | personal | support | — |
