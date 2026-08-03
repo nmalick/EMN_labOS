@@ -5,11 +5,8 @@
     "command": "~/.claude/statusline.sh",
     "refreshInterval": 30
   },
-  "enabledPlugins": {
-    "posthog@claude-plugins-official": true
-  },
+  "effortLevel": "xhigh",
   "skipWorkflowUsageWarning": true,
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true,
-  "effortLevel": "xhigh"
+  "agentPushNotifEnabled": true
 }
