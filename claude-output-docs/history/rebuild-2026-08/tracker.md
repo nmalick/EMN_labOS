@@ -27,6 +27,7 @@
 | 1.7 | 1 | Hooks hardening | ✅ | `c64a5d8` | identities.local (gitignored, staged-block asserted) + `.labos-allow`; scratch matrix 6/6; self-test commit passed; pre-push first-push hole closed + secret backstop |
 | 1.8 | 1 | includeIf + smoke tests | ✅ | — | `gitdir/i:~/YaqeenProjects/**` after `[user]`; SMOKE B: virgin repo under YaqeenProjects resolves work email + passes work-profile hook; SMOKE C: JourneyOS resolves work email; personal profile proven by all run commits. Revert: delete includeIf block + `~/.gitconfig-work` |
 | 1.9 | 1 | Eviction hand-off | ✅ | `6cea198` (stub) | Detail → JourneyOS `.claude-work/plans/global-work-eviction.md` (gitignored, repo untouched); pointer stub in umbrella |
+| 1.11 | 1 | Hook-effectiveness canary | ✅ | — | Work token staged outside `.labos-allow` → BLOCKED by new hook (public-repo guard proven live); worktree-config layering fixed | 
 | 1.10 | 1 | Snapshot + public-surface shrink | ✅ | `6cea198` | 4-file public snapshot; Telegram/SOXLA agent copies GONE from public repo; guard green (work+client classes); local half synced not destroyed. Note: `/doctor` is an interactive-CLI dialog — equivalent checks done (JSON validity, hook matrix, guard); interactive run listed in ACTION-REQUIRED |
 
 ## Config changes ledger (pre/post + revert one-liners)
@@ -35,6 +36,7 @@
 |---|---|---|
 | P0 | Umbrella worktree branch `claude/emn-journey-os-architecture-10cda1` → `rebuild/2026-08` | `git checkout claude/emn-journey-os-architecture-10cda1` |
 | P1 | GLOBAL `core.hooksPath` → rebuild-branch checkout | `git config --global core.hooksPath /Users/malick/EMN_labOS/hooks` |
+| P1 | WORKTREE-level `core.hooksPath` (extensions.worktreeConfig=true; config.worktree pointed at primary = OLD hooks) → rebuild checkout | `git config --worktree core.hooksPath /Users/malick/EMN_labOS/hooks` |
 | P1 | LOCAL umbrella `core.hooksPath` (was relative `hooks` → resolved to primary/main = OLD hooks) → rebuild checkout absolute | `git -C /Users/malick/EMN_labOS config --local core.hooksPath hooks` |
 
 ## Decisions log (T3 + ACTION-REQUIRED accumulator)
