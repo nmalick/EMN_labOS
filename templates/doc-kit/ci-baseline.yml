@@ -1,0 +1,28 @@
+name: CI baseline
+# Installed by the doc kit. Build/typecheck per stack + the deterministic docs-freshness
+# gate (runs everywhere — it is not a build check, so "Vercel already builds PRs" does not
+# exempt a repo from it).
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 1"   # weekly freshness sweep
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Build / typecheck
+        run: |
+          # REPLACE with the repo's VERIFY_CMD from project-os/ops/verify.md
+          echo "configure me: see project-os/ops/verify.md"
+  docs-freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Doc freshness (TTL / citation rot / stale base)
+        run: python3 project-os/ops/check-freshness.py --root project-os --repo .
