@@ -39,6 +39,8 @@
 !/.labos-allow
 !/.github/
 !/.github/**
+!/tests/
+!/tests/**
 # Hard re-exclusions (never track even if allowlisted)
 /hooks/*.local
 .DS_Store

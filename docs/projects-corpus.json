@@ -13,7 +13,11 @@
     "live_url": "",
     "summary": "Tajweed learning app for Quran recitation \u2014 guided lessons, practice, AI-assisted reading.",
     "highlights": [],
-    "showcase": true
+    "showcase": true,
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
   },
   {
     "name": "Art is Everywear",
@@ -29,7 +33,11 @@
     ],
     "live_url": "https://aubreyorlando.art",
     "summary": "Storefront for original artwork and small-batch apparel \u2014 made-to-order requests with a Firebase-backed catalog and admin.",
-    "highlights": []
+    "highlights": [],
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
   },
   {
     "name": "bil-app",
@@ -45,7 +53,11 @@
     "live_url": "",
     "summary": "Proof-of-concept app (mobile client + backend).",
     "highlights": [],
-    "showcase": true
+    "showcase": true,
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
   },
   {
     "name": "EMN Labs",
@@ -60,7 +72,11 @@
     ],
     "live_url": "https://emnlabs.io",
     "summary": "Personal portfolio and EMN Labs showcase site.",
-    "highlights": []
+    "highlights": [],
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
   },
   {
     "name": "qari-assets",
@@ -75,6 +91,10 @@
     "summary": "Quranic fonts and Tajweed typesetting assets consumed by the Qari app.",
     "highlights": [],
     "showcase": true,
-    "repo_url": "https://github.com/nmalick/qari-assets"
+    "repo_url": "https://github.com/nmalick/qari-assets",
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
   }
 ]
