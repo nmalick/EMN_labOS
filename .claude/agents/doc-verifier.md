@@ -20,7 +20,11 @@ CHECKS (all decidable):
    file; line within ±5 of matching content ⇒ LINE_DRIFT note, else MISSING evidence ⇒ FAIL class.
 2. Every INFERRED manifest line pairs 1:1 with an in-doc `Inferred — needs review` tag.
 3. Assertive doc lines absent from the manifest ⇒ UNCITED_CLAIM.
-4. Frontmatter: required fields present; status value legal; `verified_against` is a real sha
+4. Commit-type citations: existence AND reachability — `git cat-file -t <sha>` exists AND
+   `git merge-base --is-ancestor <sha> <the branch under review>` (an orphaned SHA from a
+   rewritten branch resolves locally via dangling objects but 404s for every clone — treat
+   EXISTS-BUT-UNREACHABLE as MISSING evidence).
+5. Frontmatter: required fields present; status value legal; `verified_against` is a real sha
    (`git cat-file -t`); TTL arithmetic (last_verified + ttl_days vs today).
 
 RECEIPT (final message, nothing else):
