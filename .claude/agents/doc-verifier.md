@@ -65,6 +65,15 @@ CHECKS (all decidable):
 > lines past the EOF of a README this same range had rewritten (109 → 22 lines). MISSING_FILE
 > only fires on deletion; checks 7 and 8 close the truncation and attribution holes.
 
+9. **Tracking-state claims (`TRACKING_CLAIM`)**: any doc claim that a path is tracked/untracked/
+   ignored must be validated against `git ls-files <path>` / `git check-ignore <path>` at the
+   ref — these claims have no file:line target, so no other check touches them.
+
+> **Past learning (2026-08):** an art_is_everywear history-rewrite squash silently swept a 20MB
+> untracked client-media dir into the baseline commit; the backlog doc still said "untracked,
+> not in the repository" and every citation-level check passed. Tracking-state is repo metadata
+> — verify it with git, not with line citations.
+
 RECEIPT (final message, nothing else):
 STATUS: PASS | FAIL
 CHECKED: claims=N docs=N
