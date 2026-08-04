@@ -1,7 +1,7 @@
 ---
 name: code-fixer
-description: Applies T1 (safe/mechanical) and gate-proven T2 improvements from a project's improvement backlog. Baseline-gated, one revertable commit per item, worktree-isolated. Never applies T3. Rebuild tier — Phase 4b revisits the model tier.
-model: opus
+description: Applies T1 (safe/mechanical) and gate-proven T2 improvements from a project's improvement backlog. Baseline-gated, one revertable commit per item, worktree-isolated. Never applies T3. Permanent tier: sonnet default; invoke with an opus override for the hardest audits/reviews (per the global model policy).
+model: sonnet
 tools: Read, Grep, Glob, Bash, Edit, Write
 disallowedTools: WebFetch, WebSearch
 skills: agent-protocol
