@@ -61,7 +61,9 @@
 | 3.16 | 3 | emnlabs reviewer + PR | ✅ | **[PR #2](https://github.com/nmalick/emnlabs_site/pull/2)** | SHIP-WITH-NOTES; live /field-notes bug fixed; tag pushed |
 | M-3 | merge | ALL rebuild PRs merged (by user) | ✅ | umbrella `f197422` · Qari `e7ca8e5` · emnlabs `2901d1e` · qari-assets `ffe0585` | Umbrella main now carries the full tooling (generators/CI/fleet/templates); 3 project baselines live on their mains. Phase 4b/5 continues on branch `rebuild/phase45` |
 | 3.17 | 3 | bil-app baseline | ▶ (recon running) | — | recon → kit → audit → fix → PR |
-| 3.18 | 3 | art_is_everywear baseline | ⏳ | — | full baseline from origin/main (41 commits); code stays at root |
+| 4b.1 | 4b | Permanent roster | ✅ | `de95113` (on rebuild/phase45) | Retired 4 stale agents (project-manager/backend-eng/frontend-eng/qa); researcher rewritten; fleet tier opus→sonnet (permanent; opus per-invocation); +3 skills (update-ref/labos-maintenance/new-project); roster.md generated; gate clean |
+| 3.17b | 3 | bil-app kit + migration + audit | ▶ | boundary `670946a`, kit `7aae9b8` | 13 renames (space-bearing path handled); 3 auditors running (eng+ops, product+history, improvements) |
+| 3.18 | 3 | art_is_everywear baseline | ▶ (recon running) | — | full baseline from origin/main (41 commits); code stays at root |
 | 1.11 | 1 | Hook-effectiveness canary | ✅ | — | Work token staged outside `.labos-allow` → BLOCKED by new hook (public-repo guard proven live); worktree-config layering fixed | 
 | 1.10 | 1 | Snapshot + public-surface shrink | ✅ | `6cea198` | 4-file public snapshot; Telegram/SOXLA agent copies GONE from public repo; guard green (work+client classes); local half synced not destroyed. Note: `/doctor` is an interactive-CLI dialog — equivalent checks done (JSON validity, hook matrix, guard); interactive run listed in ACTION-REQUIRED |
 
