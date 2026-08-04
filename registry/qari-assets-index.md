@@ -4,4 +4,12 @@
 
 _Generated pointer into the project's own `project-os/`; content lives in the project repo._
 
-_No project-os doc kit yet (pre-baseline)._
+> Repo**: nmalick/qari-assets · **Last commit checked**: `4f8972d` (2026-06-28) · **Last updated**: 2026-08-02
+
+| Doc | Contains | Reference when |
+| engineering/architecture.md | The manifest/release contract: 5 variants × 2 shapes, schema v4 field-by-field, tag-pinning, auto-release pipeline, licensing pointers | Any question about the assets, manifest, or releases — BEFORE reading the scripts |
+| history/2026.md | Event log · backfilled decision log · experiments/dropped (honest negatives) | Why the repo is shaped this way; what was tried |
+| history/CHANGELOG.md | Reconstructed per-tag release sections (Inferred-tagged) + verified baseline boundary | What shipped in which tag |
+| ops/verify.md | VERIFY_CMD contract (volatile-field ignores) + release-safety rules | Before any change or CI work |
+| plans/README.md | Policy: backlogs tracked privately (public repo) | — |
+| research/ design/ analytics/ | Empty by design (evidence-backed stubs) | — |

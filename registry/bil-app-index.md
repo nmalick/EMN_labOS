@@ -4,4 +4,15 @@
 
 _Generated pointer into the project's own `project-os/`; content lives in the project repo._
 
-_No project-os doc kit yet (pre-baseline)._
+> Repo**: nmalick/bil-app · **Last commit checked**: `d8d4090` (2026-06-28) · **Last updated**: 2026-08-03
+
+| Doc | Contains | Reference when |
+| engineering/architecture.md | Code-verified architecture across the 3 sub-apps: the REAL backend route table, mobile nav/state, landing-page | Any stack/structure question — BEFORE code |
+| engineering/features/ | Migrated per-tab scope/status docs (some contradict code — see architecture Gotchas) | Feature-level history |
+| engineering/interaction_rules.md | Migrated UX rules (day-1, stale) | Historical |
+| product/features.md | Feature inventory (built vs documented-but-unbuilt) | What exists vs promised |
+| product/prds/ | Migrated PRDs (aspirational — Firebase/GPT-4o Story Engine never built) | Original intent |
+| history/2025-2026.md | Event log (6-week burst + the add-then-remove EmailJS arc); decision log; dropped/abandoned | Why it's this way |
+| history/CHANGELOG.md | Reconstructed release timeline (no tags existed) | What shipped when |
+| plans/improvement-backlog.md + plans/legacy/sprint_planning.md | T1/T2/T3 + the frozen sprint snapshot | Before changing code |
+| ops/verify.md | Per-sub-app VERIFY_CMD | Build work |

@@ -4,4 +4,14 @@
 
 _Generated pointer into the project's own `project-os/`; content lives in the project repo._
 
-_No project-os doc kit yet (pre-baseline)._
+> Repo**: nmalick/emnlabs_site · **Last commit checked**: `ac17262` (2026-07-19) · **Last updated**: 2026-08-03
+
+| Doc | Contains | Reference when |
+| engineering/architecture.md | Code-verified architecture (214 claims): stack, Friday runtime deep-dive, Firestore data layer, rules, analytics, deploy | Any stack/structure question — BEFORE code |
+| product/features.md | Feature inventory (SHIPPED/DROPPED/PLANNED rows) incl. Friday + the pre-redesign dead generation | What exists vs promised |
+| product/status.md | Current one-pager (live at emnlabs.io) | Quick state |
+| product/features-legacy-2026-02.md · redesign_prd.md | Superseded/legacy product docs (historical) | Design-intent archaeology |
+| history/2025-2026.md · CHANGELOG.md | Two-era event log + reconstructed changelog (pre-reset history via rescue tags — local-only) | Why it's this way; what shipped |
+| plans/improvement-backlog.md | T1/T2/T3 + dependency debt | Before changing code |
+| ops/deploy.md · ref-map.md · backup.md · secrets.md · FIREBASE_SETUP.md | Deploy runbook · /update-ref triage · backup posture · secrets-by-name · Firebase setup | Build/deploy/maintenance |
+| analytics/instrumentation.md | Amplitude + Session Replay (consent posture flagged) | Analytics questions |
