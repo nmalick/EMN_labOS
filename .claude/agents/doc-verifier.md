@@ -32,6 +32,13 @@ CHECKS (all decidable):
    line, and both must match the code. Report:
    - `PROSE_MANIFEST_DIVERGENCE` — prose says one coordinate, manifest says another, with no
      pre-fix-evidence suffix explaining it.
+   - `DOC_SIDE_DESYNC` — the manifest's DOC-side line number does not land on the claim it
+     cites. Test both: (i) the target line is non-blank, and (ii) it contains a token from the
+     cited source path (basename or stem). Detection signal: build an **offset histogram** over
+     each manifest — a single dominant non-zero bucket (e.g. 45 entries at +8) means an
+     insertion shifted the doc while the manifest stayed put. Blank-target and blind-shift
+     checks are BOTH insufficient alone: an entry can be non-blank and still bind the wrong
+     claim. Repair by content match, never by uniform shift.
    - `SELF_CONTRADICTION` — the same doc states one fact two ways (classically: a `RESOLVED`
      banner whose paragraph beneath still asserts the pre-fix state without a pre-fix marker).
    - `BANNER_MISPLACED` — a `RESOLVED at <sha>` banner sits under a section whose defect it does
