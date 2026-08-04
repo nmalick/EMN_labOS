@@ -1,0 +1,24 @@
+name: labOS CI
+
+# push+pull_request+dispatch so checks run on the open PRs of the no-merge
+# rebuild flow (a main-only trigger would never fire before merge).
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # registry_date derives from git log
+      - name: Default-deny regression tests
+        run: python3 tests/test_default_deny.py
+      - name: Catalog drift gate (generated surfaces match registry)
+        run: python3 scripts/catalog_sync.py --check
+      - name: Silent-swallow tripwire (deny-all .gitignore)
+        run: bash scripts/check-tracked.sh
+      - name: Doc freshness (deterministic — TTL / citation rot / stale base)
+        run: python3 scripts/check-freshness.py --root claude-output-docs --repo .

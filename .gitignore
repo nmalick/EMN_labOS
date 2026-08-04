@@ -13,7 +13,14 @@
 !/projects.json
 !/.mcp.json
 !/.claude/
-!/.claude/**
+!/.claude/.gitkeep
+!/.claude/settings.json
+!/.claude/agents/
+!/.claude/agents/**
+!/.claude/commands/
+!/.claude/commands/**
+!/.claude/skills/
+!/.claude/skills/**
 !/registry/
 !/registry/**
 !/templates/
@@ -29,12 +36,19 @@
 !/home-claude/
 !/home-claude/**
 !/manifest.sh
+!/.labos-allow
+!/.github/
+!/.github/**
+!/tests/
+!/tests/**
 # Hard re-exclusions (never track even if allowlisted)
+/hooks/*.local
 .DS_Store
 **/.git
 **/node_modules/
 **/__pycache__/
-.env*
+.env
+.env.*
 **/.vercel/
 *.bundle
 # Agent worktrees live under .claude/, which is allowlisted above — re-exclude

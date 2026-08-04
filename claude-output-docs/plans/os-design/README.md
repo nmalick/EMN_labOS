@@ -1,4 +1,5 @@
 # os-design/
 
-Internal OS design/build plans live in `~/.claude/plans/` and are intentionally NOT
-tracked here — this is a PUBLIC repo. Only publish sanitized artifacts.
+OS design/build artifacts. This is a PUBLIC repo — only **sanitized artifacts** land here
+(rewritten-from-scratch summaries, never redacted copies of private material). Raw working
+plans live in the machine-local plan store and the private run archive.

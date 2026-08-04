@@ -7,7 +7,15 @@ set -uo pipefail
 EXPECTED_GH="nmalick"
 EXPECTED_NAME="Malick Ndiaye"
 EXPECTED_EMAIL="nmalicksn@gmail.com"
-EXPECTED_HOOKS="$HOME/EMN_labOS/hooks"
+# hooksPath: keep a VALID existing setting (bootstrap may point at a non-default
+# umbrella); repair to the default only when current is missing/invalid; FAIL if
+# neither resolves — a missing hooksPath silently disables every hook (no wall).
+CURRENT_HOOKS="$(git config --global core.hooksPath 2>/dev/null || true)"
+if [ -n "$CURRENT_HOOKS" ] && [ -f "$CURRENT_HOOKS/pre-commit" ]; then
+  EXPECTED_HOOKS="$CURRENT_HOOKS"
+else
+  EXPECTED_HOOKS="$HOME/EMN_labOS/hooks"
+fi
 MCP_ACCOUNTS="$HOME/.claude/mcp-accounts.json"
 
 ok()   { printf '  \033[32m✅\033[0m %s\n' "$1"; }
@@ -50,7 +58,10 @@ set_if() { # key want
 set_if user.name "$EXPECTED_NAME"
 set_if user.email "$EXPECTED_EMAIL"
 set_if core.hooksPath "$EXPECTED_HOOKS"
-[ -d "$EXPECTED_HOOKS" ] || warn "hooksPath dir missing ($EXPECTED_HOOKS) — clone the umbrella to \$HOME/EMN_labOS"
+if [ ! -f "$EXPECTED_HOOKS/pre-commit" ]; then
+  err "hooksPath INVALID ($EXPECTED_HOOKS has no pre-commit) — the identity wall is DOWN. Clone the umbrella or fix core.hooksPath."
+  exit 1
+fi
 echo
 
 # 3) Cloud CLIs (report only) ----------------------------------------------

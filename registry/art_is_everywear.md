@@ -7,8 +7,8 @@ status: live
 live_url: https://aubreyorlando.art
 repo_url: https://github.com/nmalick/art_is_everywear
 repo_public: false
-stack: Next.js, TypeScript, Tailwind, Firebase, Stripe, Vercel
-summary: Storefront for original artwork and small-batch apparel — catalog, cart, and Stripe checkout.
+stack: Next.js, TypeScript, Tailwind, Firebase, Vercel
+summary: Storefront for original artwork and small-batch apparel — made-to-order requests with a Firebase-backed catalog and admin.
 ---
 
 Client storefront, live at aubreyorlando.art. Shown in the public catalog now that it has launched;

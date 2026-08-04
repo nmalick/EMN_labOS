@@ -1,0 +1,118 @@
+[
+  {
+    "name": "Qari",
+    "slug": "Qari",
+    "bucket": "personal",
+    "status": "active",
+    "stack": [
+      "Flutter",
+      "Dart",
+      "sqflite",
+      "HuggingFace"
+    ],
+    "live_url": "",
+    "summary": "Tajweed learning app for Quran recitation \u2014 guided lessons, practice, AI-assisted reading.",
+    "highlights": [],
+    "showcase": true,
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
+  },
+  {
+    "name": "Art is Everywear",
+    "slug": "art_is_everywear",
+    "bucket": "freelance",
+    "status": "live",
+    "stack": [
+      "Next.js",
+      "TypeScript",
+      "Tailwind",
+      "Firebase",
+      "Vercel"
+    ],
+    "live_url": "https://aubreyorlando.art",
+    "summary": "Storefront for original artwork and small-batch apparel \u2014 made-to-order requests with a Firebase-backed catalog and admin.",
+    "highlights": [],
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
+  },
+  {
+    "name": "bil-app",
+    "slug": "bil-app",
+    "bucket": "poc",
+    "status": "poc",
+    "stack": [
+      "React Native",
+      "Expo",
+      "Node.js",
+      "TypeScript"
+    ],
+    "live_url": "",
+    "summary": "Proof-of-concept app (mobile client + backend).",
+    "highlights": [],
+    "showcase": true,
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
+  },
+  {
+    "name": "EMN Labs",
+    "slug": "emnlabs_site",
+    "bucket": "personal",
+    "status": "live",
+    "stack": [
+      "React",
+      "Vite",
+      "Firebase",
+      "Vercel"
+    ],
+    "live_url": "https://emnlabs.io",
+    "summary": "Personal portfolio and EMN Labs showcase site.",
+    "highlights": [],
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
+  },
+  {
+    "name": "Opportunity Tool",
+    "slug": "opportunity_tool",
+    "bucket": "personal",
+    "status": "paused",
+    "stack": [
+      "JavaScript",
+      "Vercel"
+    ],
+    "live_url": "https://opportunitytool.vercel.app",
+    "summary": "Opportunity-tracking web tool \u2014 split out of the portfolio site into its own deployment.",
+    "highlights": [],
+    "showcase": true,
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
+  },
+  {
+    "name": "qari-assets",
+    "slug": "qari-assets",
+    "bucket": "personal",
+    "status": "support",
+    "stack": [
+      "Fonts",
+      "Python"
+    ],
+    "live_url": "",
+    "summary": "Quranic fonts and Tajweed typesetting assets consumed by the Qari app.",
+    "highlights": [],
+    "showcase": true,
+    "repo_url": "https://github.com/nmalick/qari-assets",
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
+  }
+]
