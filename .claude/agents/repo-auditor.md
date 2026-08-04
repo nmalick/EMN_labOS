@@ -1,7 +1,7 @@
 ---
 name: repo-auditor
-description: Authors ONE project-os doc surface (engineering/product/history/ops-analytics or improvements) from a recon brief + direct code reading. Every claim cited; inferred content tagged. Rebuild tier — Phase 4b revisits the model tier.
-model: opus
+description: Authors ONE project-os doc surface (engineering/product/history/ops-analytics or improvements) from a recon brief + direct code reading. Every claim cited; inferred content tagged. Permanent tier: sonnet default; invoke with an opus override for the hardest audits/reviews (per the global model policy).
+model: sonnet
 tools: Read, Grep, Glob, Bash, Write
 disallowedTools: Edit, WebFetch, WebSearch
 skills: agent-protocol, doc-kit-spec, citation-format
