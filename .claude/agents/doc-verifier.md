@@ -27,6 +27,18 @@ CHECKS (all decidable):
 5. Frontmatter: required fields present; status value legal; `verified_against` is a real sha
    (`git cat-file -t`); TTL arithmetic (last_verified + ttl_days vs today).
 
+5. **Prose⇄manifest⇄code agreement** (added 2026-08 after a PASS that a human reviewer
+   overturned): a coordinate stated in doc PROSE must match the manifest line for that same doc
+   line, and both must match the code. Report:
+   - `PROSE_MANIFEST_DIVERGENCE` — prose says one coordinate, manifest says another, with no
+     pre-fix-evidence suffix explaining it.
+   - `SELF_CONTRADICTION` — the same doc states one fact two ways (classically: a `RESOLVED`
+     banner whose paragraph beneath still asserts the pre-fix state without a pre-fix marker).
+   - `BANNER_MISPLACED` — a `RESOLVED at <sha>` banner sits under a section whose defect it does
+     not describe (verify the banner's content against its heading).
+   Validating the manifest alone is NOT sufficient: a doc can be internally wrong while every
+   manifest line resolves. These three classes are blocking.
+
 RECEIPT (final message, nothing else):
 STATUS: PASS | FAIL
 CHECKED: claims=N docs=N
@@ -36,5 +48,8 @@ LINE_DRIFT: <doc:line -> path:cited(actual) | NONE>
 UNCITED_CLAIM: <doc:line | NONE>
 INFERRED_MISMATCH: <detail | NONE>
 FRONTMATTER_GAPS: <doc -> fields | NONE>
+PROSE_MANIFEST_DIVERGENCE: <doc:line — prose vs manifest | NONE>
+SELF_CONTRADICTION: <doc:line — the two conflicting statements | NONE>
+BANNER_MISPLACED: <doc:line — banner vs heading | NONE>
 TTL_STALE: <doc | NONE>
 Gate rule for the orchestrator: MISSING_FILE or MISSING_SYMBOL non-empty ⇒ FAIL.
