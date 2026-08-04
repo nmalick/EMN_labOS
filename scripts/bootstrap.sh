@@ -6,7 +6,10 @@
 # Idempotent: clones are pulled/skipped if present; ~/.claude is backed up before any restore.
 #
 # Flags / env:
-#   --config-only        restore ~/.claude from the snapshot only (skip auth/clone/projects)
+#   --config-only        restore ~/.claude from the snapshot ONLY. Skips gh auth, the umbrella
+#                        clone, project clones, AND the git identity + core.hooksPath setup —
+#                        i.e. it does NOT stand up the identity wall. A machine bootstrapped
+#                        with --config-only has config but no guards; run full mode for that.
 #   LABOS_UMBRELLA=<dir>  use an existing local umbrella instead of $HOME/EMN_labOS
 # Test the restore path against an isolated home without auth/network:
 #   HOME=/tmp/labos-test LABOS_UMBRELLA="$PWD" bash scripts/bootstrap.sh --config-only
@@ -112,10 +115,28 @@ if [ -d "$SNAP_PUB" ] || [ -d "$SNAP_LOC" ]; then
     local rel="$1" src dst="$CLAUDE_DIR/$1"
     src="$(find_src "$rel")"; [ -n "$src" ] || return 0
     [ -e "$dst" ] && { mkdir -p "$(dirname "$bak/$rel")"; cp -R "$dst" "$bak/$rel" 2>/dev/null || true; }
-    if [ -d "$src" ]; then mkdir -p "$dst"; cp -R "$src/." "$dst/"; else mkdir -p "$(dirname "$dst")"; cp "$src" "$dst"; fi
-    ok "restored $rel"
+    if [ -d "$src" ]; then
+      # PRUNE: a restore is authoritative — stale files left from a previous machine state
+      # must not survive (the old additive cp -R let retired agents/commands live forever).
+      if command -v rsync >/dev/null 2>&1; then
+        mkdir -p "$dst"; rsync -a --delete "$src/" "$dst/"
+      else
+        rm -rf "$dst"; mkdir -p "$dst"; cp -R "$src/." "$dst/"
+      fi
+    else
+      mkdir -p "$(dirname "$dst")"; cp "$src" "$dst"
+    fi
+    ok "restored $rel (pruned)"
   }
-  for f in CLAUDE.md statusline.sh settings.json mcp-accounts.json; do restore "$f"; done
+  for f in CLAUDE.md statusline.sh settings.json; do restore "$f"; done
+  # mcp-accounts.json: the published snapshot is a single label-keyed entry; a live machine may
+  # hold several UUID-keyed accounts. Restoring would collapse them (and mislabel sessions), so
+  # only seed it when the destination is absent or trivially small.
+  if [ ! -f "$CLAUDE_DIR/mcp-accounts.json" ]; then
+    restore mcp-accounts.json
+  else
+    warn "mcp-accounts.json present — left untouched (snapshot would collapse multi-account state)"
+  fi
   for d in commands agents; do restore "$d"; done
   chmod +x "$CLAUDE_DIR/statusline.sh" 2>/dev/null || true
   msrc="$(find_src memory)"
@@ -128,15 +149,31 @@ fi
 
 # Symlink umbrella commands so /personal-init and /labos-replicate are available globally.
 mkdir -p "$CLAUDE_DIR/commands"
-for c in personal-init labos-replicate; do
-  src="$UMBRELLA/.claude/commands/$c.md"
-  [ -f "$src" ] && ln -sfn "$src" "$CLAUDE_DIR/commands/$c.md" && ok "linked /$c (global)"
+for c in personal-init labos-replicate catalog-sync; do
+  # Commands migrated to skills in the 2026-08 rebuild; support BOTH layouts so a fresh machine
+  # gets the global entry points either way. personal-init MUST stay globally reachable — it is
+  # what you run before you are inside any repo.
+  if [ -f "$UMBRELLA/.claude/commands/$c.md" ]; then
+    ln -sfn "$UMBRELLA/.claude/commands/$c.md" "$CLAUDE_DIR/commands/$c.md" && ok "linked /$c (command)"
+  elif [ -f "$UMBRELLA/.claude/skills/$c/SKILL.md" ]; then
+    mkdir -p "$CLAUDE_DIR/skills"
+    ln -sfn "$UMBRELLA/.claude/skills/$c" "$CLAUDE_DIR/skills/$c" && ok "linked /$c (skill)"
+  else
+    warn "/$c not found as command or skill — global entry point missing"
+  fi
 done
 
 # --- 7) finalize -----------------------------------------------------------
 if [ "$MODE" = "full" ]; then
   say "Finalize"
   bash "$UMBRELLA/scripts/personal-init.sh" || true
+  # Post-install assertion — a bootstrap that "succeeds" without the wall is the worst outcome.
+  hp="$(git config --global core.hooksPath 2>/dev/null || true)"
+  if [ -n "$hp" ] && [ -f "$hp/pre-commit" ] && [ -f "$hp/pre-push" ]; then
+    ok "identity wall verified: core.hooksPath=$hp (pre-commit + pre-push present)"
+  else
+    die "identity wall NOT standing: core.hooksPath='$hp' has no pre-commit/pre-push. Fix before committing anything."
+  fi
 else
   say "Config-only restore complete"
 fi
