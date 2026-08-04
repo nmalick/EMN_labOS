@@ -71,6 +71,13 @@
 | 5.2 | 5 | Closeout config narrowing | ✅ | — | Global `additionalDirectories` REMOVED (was 3 run-scoped paths); the umbrella's own project settings carry its grant. Global permissions now: allow-only, 17 entries |
 | 1.11 | 1 | Hook-effectiveness canary | ✅ | — | Work token staged outside `.labos-allow` → BLOCKED by new hook (public-repo guard proven live); worktree-config layering fixed | 
 | 1.10 | 1 | Snapshot + public-surface shrink | ✅ | `6cea198` | 4-file public snapshot; Telegram/SOXLA agent copies GONE from public repo; guard green (work+client classes); local half synced not destroyed. Note: `/doctor` is an interactive-CLI dialog — equivalent checks done (JSON validity, hook matrix, guard); interactive run listed in ACTION-REQUIRED |
+| L-1 | leak | Leak-removal commits pushed + PR'd | ✅ | [Qari #72](https://github.com/nmalick/Qari/pull/72) · [emnlabs #3](https://github.com/nmalick/emnlabs_site/pull/3) | Forward-only removals (`f71ca31`, `ad856f8`); private-main history rewrite = user decision, default no |
+| 3.17e | 3 | bil-app chain completed → PR | ✅ | [PR #1](https://github.com/nmalick/bil-app/pull/1) · tag @ `67c3dd3` | Cursor bump `e2c5605` → verify r4 FAIL (3 reverse-direction INFERRED gaps) → repair `4da94d5` → reviewer r4 **NO-SHIP** (2 RESOLVED banners credited a manifest-only commit; Gotcha 1 asserted past-EOF README defects this range had fixed) → `20270ca` → verify r5 PASS 435/435 → r4b **NO-SHIP** (my tag-sentence fix claimed tip-position while the tag sat 8 commits back) → tag moved to tip + sweeps `67c3dd3` → verify r6 PASS (TAG/CURSOR/SWEEP checks) → **SHIP** (independent ratchet re-runs: backend tsc 0, mobile exactly 17) |
+| 3.18c | 3 | art chain completed → PR | ✅ | [PR #17](https://github.com/nmalick/art_is_everywear/pull/17) · tag @ `9b5fd90` | Post-rewrite sweep found 4 dangling evidence SHAs (kit/docs/fix/repoint commits) → repointed; verify PASS 1,428 → reviewer **NO-SHIP: the leak-purge squash had silently swept 20MB untracked `v1_assets/` client media into the baseline** while T3-4 said "untracked" → branch re-rewritten pre-push (`29d7c74` drops media + gitignores it; `9b5fd90` repoints + secrets mis-pointer + 8 wrap-drifted arch anchors) → verify r2 PASS (TRACKING_CLAIM via git ls-files/check-ignore) → **SHIP**. Transient backup ref deleted after SHIP (local-only, never pushed) |
+| 5.3 | 5 | Closeout ask-blocks ×6 | ✅ | Qari `9426093` · emnlabs `452fe46` · bil `caa5264` · qari-assets `fb68777` → [PR #9](https://github.com/nmalick/qari-assets/pull/9) · art `de14591` · umbrella `a8c1982` | `permissions.ask` = Edit/Write on enumerated code roots (plan §1.3); post-baseline by design; open PRs updated in place |
+| 5.4 | 5 | Fleet contract upgrades (Past-learning ×3) | ✅ | `9dbca97` · `a0804df` | doc-verifier: INFERRED pairing is a bijection; SRC_LINE_OOB (truncation ≠ deletion); BAD_FIX_ATTRIBUTION (git show --stat every banner SHA); TRACKING_CLAIM (tracked/untracked claims verify via git metadata, not citations) |
+| 5.5 | 5 | FINAL RECAP + umbrella PR | ✅ | `final-recap.md` · PR from `rebuild/phase45` | Merge runbook: 6 open PRs w/ order + merge-commit requirements (bil/art/umbrella cite in-branch SHAs; qari-assets needs `[skip release]` typed at merge). Gate green: catalog `--check` clean; default-deny 7/7 (direct runner — no local pytest; CI runs pytest on the PR) |
+| 5.6 | 5 | hooksPath re-asserted to primary checkout | ✅ | — | `identities.local` copied to primary `hooks/` first (hooks fail without it); global + worktree + local re-pointed per P1 revert one-liners; scratch-commit assert: hooks fire from primary path |
 
 ## Config changes ledger (pre/post + revert one-liners)
 
@@ -80,6 +87,8 @@
 | P1 | GLOBAL `core.hooksPath` → rebuild-branch checkout | `git config --global core.hooksPath /Users/malick/EMN_labOS/hooks` |
 | P1 | WORKTREE-level `core.hooksPath` (extensions.worktreeConfig=true; config.worktree pointed at primary = OLD hooks) → rebuild checkout | `git config --worktree core.hooksPath /Users/malick/EMN_labOS/hooks` |
 | P1 | LOCAL umbrella `core.hooksPath` (was relative `hooks` → resolved to primary/main = OLD hooks) → rebuild checkout absolute | `git -C /Users/malick/EMN_labOS config --local core.hooksPath hooks` |
+| P5 | All three hooksPath layers re-asserted to the primary checkout (P1 reverts applied); `identities.local` copied to primary `hooks/` | re-point back at the worktree if a future run needs the rebuild-branch hooks |
+| P5 | `permissions.ask` code-guard appended to all six tracked `.claude/settings.json` | delete the `ask` array from the file(s) |
 
 ## Decisions log (T3 + ACTION-REQUIRED accumulator)
 
@@ -101,6 +110,7 @@
 | D-15 | INPUT NEEDED | emnlabs: exact production origin list for the Friday CORS lock (emnlabs.io + www + *.vercel.app previews?) — T2-03 applies it | emnlabs ops audit |
 | D-16 | ACTION-REQUIRED | Firestore backups/PITR console check (both emnlabs + art) — contactMessages/orders are the non-reproducible collections | emnlabs ops audit |
 | D-4 | ACTION-REQUIRED | Run interactive `/doctor` once in a fresh session (dialog command — not invocable unattended) | Phase 1 gate |
+| D-17 | ACTION-REQUIRED | art: `v1_assets/` 20MB client media stays untracked + gitignored after a near-miss sweep into the baseline (reviewer catch) — disposition is the owner's call (backlog T3-4) | art re-review |
 
 ## Debt register
 
