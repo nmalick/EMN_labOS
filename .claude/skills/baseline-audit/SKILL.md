@@ -57,7 +57,11 @@ decisions log and continue with the next step that doesn't depend on it.
 > 1. Repoint every surface: resolved bugs get a `RESOLVED at <sha>` banner (keep the pre-fix
 >    description for provenance, never silently rewrite history);
 > 2. Annotate citations to deleted/changed files as *(deleted at `<sha>` — pre-fix evidence)* —
->    the verifier classifies annotated ones as DOCUMENTED-HISTORICAL, unannotated as MISSING;
+>    the verifier classifies annotated ones as DOCUMENTED-HISTORICAL, unannotated as MISSING.
+>    **The annotation must be in the `.citations` MANIFEST, not only the doc prose** — the
+>    manifest is the machine-read surface (round-2 failure on bil-app: prose annotated, manifest
+>    not, verifier still FAILed all 7). Doc-line refs in the manifest also drift when the doc
+>    grows during remediation — re-derive them, don't trust the original;
 > 3. Bump `verified_against:` on EVERY doc to the post-fix sha;
 > 4. **Re-run the blind verify against the post-fix HEAD** — the pre-fix receipt is not evidence
 >    for the range.
