@@ -16,6 +16,8 @@ jobs:
           fetch-depth: 0   # registry_date derives from git log
       - name: Default-deny regression tests
         run: python3 tests/test_default_deny.py
+      - name: Minesweeper engine rules (docs/minesweeper.html)
+        run: node tests/minesweeper.test.mjs
       - name: Catalog drift gate (generated surfaces match registry)
         run: python3 scripts/catalog_sync.py --check
       - name: Silent-swallow tripwire (deny-all .gitignore)

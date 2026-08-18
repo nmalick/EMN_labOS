@@ -10,7 +10,7 @@ On-demand map of the umbrella. Load this when you need to know where something l
 | `now.md` | Current focus, high-signal |
 | `README.md` · `STATUS.md` · `ROADMAP.md` · `RELEASE-NOTES.md` | **Generated** catalog (do not hand-edit) |
 | `projects.json` | **Generated** machine artifact the portfolio consumes |
-| `docs/` | **Generated** public pages: `index.html` (catalog) · `ai-ops.html` (AI-operations showcase) · `projects-corpus.json` (future ingestion contract) |
+| `docs/` | Public pages. **Generated:** `index.html` (catalog) · `ai-ops.html` (AI-operations showcase) · `projects-corpus.json` (future ingestion contract). **Hand-authored:** `minesweeper.html` (self-contained game; engine gated by `tests/minesweeper.test.mjs`) |
 | `.gitignore` | Deny-all + allowlist (linchpin of public/private separation). `scripts/check-tracked.sh` trips on silent swallows |
 | `.labos-allow` | Path allowlist for the public-repo token scan in `hooks/pre-commit` (reviewer-gated changes) |
 | `.mcp.json` | **Policy marker** (`{}` — no project MCP servers by design; personal connectors are account-level) |
@@ -18,7 +18,7 @@ On-demand map of the umbrella. Load this when you need to know where something l
 | `.claude/` | Umbrella project settings + agents/skills (explicit-subpath allowlist; worktrees/local state never tracked) |
 | `registry/` | Source of truth for the catalog: `<project>.md` frontmatter (see `registry/README.md` for the v2 contract) · hand-authored `ai-ops-prose.md` · **generated** `<slug>-index.md` pointer indexes |
 | `scripts/` | `catalog_sync.py` (+`--check`) · `gen_manifest.py` · `check-tracked.sh` · `check-freshness.py` · `snapshot.sh` · `bootstrap.sh` · `personal-init.sh` · shared `lib/registry.py` |
-| `tests/` | Default-deny regression tests (run by CI on every push/PR) |
+| `tests/` | Default-deny regression tests + `minesweeper.test.mjs` engine rules (both run by CI on every push/PR) |
 | `.github/workflows/ci.yml` | Catalog drift gate + tests + tripwire + doc freshness |
 | `home-claude/` | **Generated** allowlist-synthesized public snapshot of `~/.claude` (restored by bootstrap) |
 | `manifest.sh` | **Generated** clone list — `repo_public` entries only |
