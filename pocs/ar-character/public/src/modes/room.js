@@ -53,7 +53,7 @@ export class RoomMode {
       // view, so the hint, the readout and every button are invisible and the
       // only way out is the system back gesture.
       optionalFeatures: ['local-floor', 'anchors', 'plane-detection', 'light-estimation', 'dom-overlay'],
-      domOverlay: { root: document.body },
+      domOverlay: { root: document.getElementById('ar-overlay') ?? document.body },
     });
 
     await this.renderer.xr.setSession(this.session);

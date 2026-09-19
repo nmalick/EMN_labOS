@@ -120,6 +120,32 @@ const check = (name, pass, detail = '') => {
     check('optical flow producing a value', hud.speed !== '—', hud.speed);
     check('obstacle tracker reporting', /^\d+$/.test(hud.obs), `${hud.obs} tracked`);
 
+    // Regression guard: the dom-overlay root is composited over the AR camera
+    // passthrough, so ANY opaque background in it turns Room mode into a black
+    // screen. This shipped once already (root was document.body, which carries
+    // the page background).
+    const overlay = await page.evaluate(() => {
+      const el = document.getElementById('ar-overlay');
+      if (!el) return { missing: true };
+      const opaque = (n) => {
+        const bg = getComputedStyle(n).backgroundColor;
+        const m = bg.match(/rgba?\(([^)]+)\)/);
+        if (!m) return bg !== 'transparent';
+        const p = m[1].split(',').map(Number);
+        return (p[3] ?? 1) > 0.95;
+      };
+      // Only full-bleed elements can occlude the whole view; panels are fine.
+      const fullBleed = [el, ...el.children].filter((n) => {
+        const r = n.getBoundingClientRect();
+        return r.width >= innerWidth * 0.9 && r.height >= innerHeight * 0.9;
+      });
+      return { missing: false, occluding: fullBleed.filter(opaque).map((n) => n.id || n.className) };
+    });
+    check('dom-overlay root exists', !overlay.missing);
+    check('dom-overlay root does not occlude camera passthrough',
+      !overlay.missing && overlay.occluding.length === 0,
+      overlay.occluding?.join(', ') || 'transparent');
+
     const canvasLive = await page.evaluate(() => {
       const c = document.getElementById('gl');
       return c.width > 0 && c.height > 0;

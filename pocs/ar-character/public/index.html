@@ -50,20 +50,25 @@
   <video id="feed" playsinline muted autoplay></video>
   <canvas id="gl"></canvas>
 
-  <div id="hud" class="hud hidden">
-    <div class="hud-row"><span class="hud-k">speed</span><span class="hud-v" id="hud-speed">—</span></div>
-    <div class="hud-row"><span class="hud-k">state</span><span class="hud-v" id="hud-state">—</span></div>
-    <div class="hud-row"><span class="hud-k">tracked</span><span class="hud-v" id="hud-obs">—</span></div>
-    <div class="hud-row"><span class="hud-k">fps</span><span class="hud-v" id="hud-fps">—</span></div>
-  </div>
+  <!-- dom-overlay root. Only this subtree is composited into the AR view, and
+       it MUST stay transparent: any opaque background in here paints over the
+       camera passthrough and you get a black screen instead of your room. -->
+  <div id="ar-overlay">
+    <div id="hud" class="hud hidden">
+      <div class="hud-row"><span class="hud-k">speed</span><span class="hud-v" id="hud-speed">—</span></div>
+      <div class="hud-row"><span class="hud-k">state</span><span class="hud-v" id="hud-state">—</span></div>
+      <div class="hud-row"><span class="hud-k">tracked</span><span class="hud-v" id="hud-obs">—</span></div>
+      <div class="hud-row"><span class="hud-k">fps</span><span class="hud-v" id="hud-fps">—</span></div>
+    </div>
 
-  <div id="reticle-hint" class="hint hidden">Point at the floor, then tap to place</div>
-  <div id="toast" class="toast hidden"></div>
+    <div id="reticle-hint" class="hint hidden">Point at the floor, then tap to place</div>
+    <div id="toast" class="toast hidden"></div>
 
-  <div class="stage-controls">
-    <button id="btn-back" class="ctl" title="Back">&#8592;</button>
-    <button id="btn-hud" class="ctl" title="Toggle readout">&#9636;</button>
-    <button id="btn-wave" class="ctl" title="Wave">&#9995;</button>
+    <div class="stage-controls">
+      <button id="btn-back" class="ctl" title="Back">&#8592;</button>
+      <button id="btn-hud" class="ctl" title="Toggle readout">&#9636;</button>
+      <button id="btn-wave" class="ctl" title="Wave">&#9995;</button>
+    </div>
   </div>
 </section>
 

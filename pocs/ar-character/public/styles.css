@@ -89,6 +89,12 @@ html, body {
 
 /* ---------- stage ---------- */
 #stage { background: #000; }
+
+/* dom-overlay root — transparent by contract (see index.html). pointer-events
+   are off so taps fall through to the AR session for placement; only the
+   actual controls take input back. */
+#ar-overlay { position: absolute; inset: 0; background: transparent; pointer-events: none; }
+#ar-overlay .ctl, #ar-overlay .toast { pointer-events: auto; }
 #feed, #gl { position: absolute; inset: 0; width: 100%; height: 100%; }
 #feed { object-fit: cover; }
 #gl { touch-action: none; }
