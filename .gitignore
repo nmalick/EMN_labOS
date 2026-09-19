@@ -41,6 +41,9 @@
 !/.github/**
 !/tests/
 !/tests/**
+# POC tracked in-repo by exception (approved) — normally pocs/ is never tracked.
+# Children are re-denied and narrowed in the gitlink guard at the bottom.
+!/pocs/
 # Hard re-exclusions (never track even if allowlisted)
 /hooks/*.local
 .DS_Store
@@ -65,4 +68,15 @@
 # Gitlink guard: never embed a project repo
 /personal-projects/
 /freelance-projects/
-/pocs/
+/pocs/*
+# Exception (approved): the ar-character POC is tracked here for now. Everything
+# else under pocs/ stays denied by the /pocs/* line above.
+!/pocs/ar-character/
+!/pocs/ar-character/**
+# Re-assert the hard exclusions INSIDE the tracked POC. The two ! rules above are
+# later in this file than the global **/node_modules/ etc., so they would
+# otherwise win and drag build output into the public repo.
+/pocs/ar-character/node_modules/
+/pocs/ar-character/.vercel/
+/pocs/ar-character/shots/
+/pocs/**/.git

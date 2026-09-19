@@ -1,0 +1,19 @@
+{
+  "name": "ar-character",
+  "version": "0.1.0",
+  "description": "AR character prototype - Road (camera composite) and Room (WebXR) modes",
+  "scripts": {
+    "dev": "node server.js",
+    "test": "node test/smoke.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "three": "^0.180.0"
+  },
+  "private": true,
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}
