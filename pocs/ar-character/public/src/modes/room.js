@@ -94,7 +94,10 @@ export class RoomMode {
   }
 
   emote(name = 'Wave') {
-    if (this.placed) this.character?.trigger(name);
+    // Never a dead button: before placement, this places the character (which
+    // waves on arrival) rather than silently doing nothing.
+    if (!this.placed) { this._onSelect(); return; }
+    this.character?.trigger(name);
   }
 
   // --- scene ---------------------------------------------------------------
@@ -141,9 +144,14 @@ export class RoomMode {
   // --- interaction ---------------------------------------------------------
 
   _onSelect() {
-    if (!this.reticle.visible) return;
+    this.taps = (this.taps ?? 0) + 1;
 
-    const p = new THREE.Vector3().setFromMatrixPosition(this.reticle.matrix);
+    // A surface is preferred, but not required. Requiring it meant that on a
+    // floor ARCore could not lock onto, every tap was silently discarded and
+    // nothing on screen explained why.
+    const p = this.reticle.visible
+      ? new THREE.Vector3().setFromMatrixPosition(this.reticle.matrix)
+      : this._inFrontOfCamera();
 
     if (!this.placed) {
       this.placed = true;
@@ -163,6 +171,29 @@ export class RoomMode {
     }
   }
 
+  /**
+   * A point ~1.5m ahead of where you are looking, on the floor.
+   * With a local-floor reference space y=0 IS the floor; with plain `local`
+   * the origin sits at roughly head height where the session began, so drop
+   * by a typical hold height instead.
+   */
+  _inFrontOfCamera() {
+    const cam = this.renderer.xr.getCamera?.() ?? this.camera;
+    const pos = new THREE.Vector3().setFromMatrixPosition(cam.matrixWorld);
+
+    const fwd = new THREE.Vector3(0, 0, -1)
+      .applyQuaternion(new THREE.Quaternion().setFromRotationMatrix(cam.matrixWorld));
+    fwd.y = 0;
+    if (fwd.lengthSq() < 1e-6) fwd.set(0, 0, -1);
+    fwd.normalize();
+
+    const floorY = this.session?.enabledFeatures?.includes('local-floor')
+      ? 0
+      : pos.y - 1.35;
+
+    return new THREE.Vector3(pos.x + fwd.x * 1.5, floorY, pos.z + fwd.z * 1.5);
+  }
+
   // --- frame ---------------------------------------------------------------
 
   _frame(time, frame) {
@@ -180,7 +211,9 @@ export class RoomMode {
 
     if (this.hud) {
       this.hud.speed.textContent = this.placed ? this.character.speed.toFixed(2) : '—';
-      this.hud.state.textContent = this.placed ? this.character.state : 'placing';
+      this.hud.state.textContent = this.placed
+        ? this.character.state
+        : `placing · taps ${this.taps ?? 0}`;
       this.hud.obs.textContent = this.placed ? 'anchored' : (this.reticle.visible ? 'surface' : 'searching');
       this.hud.fps.textContent = this._fps.toFixed(0);
     }
@@ -209,7 +242,7 @@ export class RoomMode {
     // ARCore needs parallax before it can find a surface, so the honest
     // instruction while searching is "move", not "point".
     this._setHint(this._searching > 4
-      ? 'Still searching — try a textured floor in better light'
+      ? 'No floor found — tap anyway to place it in front of you'
       : 'Move your phone slowly to scan the floor');
   }
 
