@@ -6,7 +6,7 @@ Two modes, because the two situations are not the same problem.
 | Mode | Situation | Technique |
 |---|---|---|
 | **Road** | Phone pointed out a car window | Camera feed + screen-composited character, driven by optical flow |
-| **Room** | Standing in a room | WebXR `immersive-ar` with hit-test and world anchoring |
+| **Room** | Standing in a room | WebXR `immersive-ar` with hit-test, world anchoring, camera-following |
 
 ## Why two engines
 
@@ -88,7 +88,7 @@ public/
     probe.js              device capability detection
     character.js          GLB + animation state machine   (shared by both modes)
     modes/road.js         camera composite, gyro, gait, parkour
-    modes/room.js         WebXR hit-test, placement, wandering
+    modes/room.js         WebXR hit-test, placement, camera-following
     perception/flow.js    sparse optical flow (block matching)
     perception/obstacles.js  detection + tracking + arrival prediction
   assets/character.glb    RobotExpressive (three.js, CC0)
@@ -96,6 +96,25 @@ public/
 ```
 
 Everything is vendored. No build step, no bundler, no network calls at runtime.
+
+## Framing in Room mode
+
+Scale in AR is fixed — a 1.6m character is 1.6m — so the only lever on apparent size is
+**distance**, and the right distance depends on the device's FOV and how high you hold the
+phone. Hardcoding it does not survive contact: at 1.5m the feet sit 43 degrees below centre
+against a 35-degree half-FOV, i.e. off the bottom of the screen, with the body filling 72%
+of the height.
+
+So the standing distance is derived at runtime from the vertical FOV read out of the XR
+projection matrix (device-set, not our nominal 70 degrees), taking the stricter of two
+constraints: the body should fill about half the screen height, and the feet must sit inside
+the lower half-FOV with margin.
+
+The character also keeps station in front of you rather than wandering. A portrait phone
+shows only about **+/-18 degrees horizontally**, so a 1.2m wander radius at conversational
+range swings more than twice the visible width — it leaves frame almost immediately. It now
+walks to wherever you are looking, with a deadzone so it is not constantly shuffling, and
+turns to face you once settled. Still real AR: it walks the floor and stays anchored to it.
 
 ## Known limits
 

@@ -14,9 +14,13 @@ import { Character } from '../character.js';
  * before you get here.
  */
 
-const WANDER_RADIUS = 1.2;     // metres from where you placed it
-const WANDER_SPEED = 0.55;     // metres per second
-const PAUSE_RANGE = [1.5, 4.5]; // seconds of idling between walks
+// The character keeps station in front of you rather than wandering freely.
+// A portrait phone shows only about +/-18 degrees horizontally, so anything
+// that strays more than ~0.5m at conversational range is simply off-screen.
+const FOLLOW_DEADZONE = 0.45;  // metres of slack before it bothers moving
+const FOLLOW_SPEED_MAX = 1.3;  // metres per second when catching up
+const TARGET_FILL = 0.52;      // fraction of screen height it should occupy
+const FIT_RANGE = [1.9, 4.0];  // clamp on the derived standing distance
 
 export class RoomMode {
   constructor({ canvas, hud, hint, onStatus, onExit }) {
@@ -31,9 +35,7 @@ export class RoomMode {
     this.viewerSpace = null;
     this.placed = false;
 
-    this.home = new THREE.Vector3();
-    this.target = new THREE.Vector3();
-    this.pause = 1.5;
+    this.floorY = 0;
     this.clock = new THREE.Clock();
     this._fps = 0;
   }
@@ -155,8 +157,7 @@ export class RoomMode {
 
     if (!this.placed) {
       this.placed = true;
-      this.home.copy(p);
-      this.target.copy(p);
+      this.floorY = p.y;
       this.character.root.position.copy(p);
       this.character.root.visible = true;
       this.contact.visible = true;
@@ -164,10 +165,9 @@ export class RoomMode {
       this.hint?.classList.add('hidden');
       this.character.trigger('Wave');
     } else {
-      // Tapping again re-homes it where you pointed.
-      this.home.copy(p);
-      this.target.copy(p);
-      this.pause = 0;
+      // Tapping again snaps it to where you pointed; follow takes over from there.
+      this.floorY = p.y;
+      this.character.root.position.copy(p);
     }
   }
 
@@ -177,7 +177,8 @@ export class RoomMode {
    * the origin sits at roughly head height where the session began, so drop
    * by a typical hold height instead.
    */
-  _inFrontOfCamera() {
+  /** Camera world position and its forward direction flattened to the floor. */
+  _camBasis() {
     const cam = this.renderer.xr.getCamera?.() ?? this.camera;
     const pos = new THREE.Vector3().setFromMatrixPosition(cam.matrixWorld);
 
@@ -187,11 +188,51 @@ export class RoomMode {
     if (fwd.lengthSq() < 1e-6) fwd.set(0, 0, -1);
     fwd.normalize();
 
-    const floorY = this.session?.enabledFeatures?.includes('local-floor')
-      ? 0
-      : pos.y - 1.35;
+    return { cam, pos, fwd };
+  }
 
-    return new THREE.Vector3(pos.x + fwd.x * 1.5, floorY, pos.z + fwd.z * 1.5);
+  /**
+   * How far away the character has to stand to actually fit on screen.
+   *
+   * Scale in AR is fixed — a 1.6m character is 1.6m — so the only thing that
+   * controls apparent size is distance, and the right distance depends on the
+   * device's FOV and how high you are holding the phone. Hardcoding it put the
+   * feet 43 degrees below centre on a 35-degree half-FOV: literally off-screen.
+   *
+   * Two constraints, take the stricter:
+   *   fill  the whole body should occupy about TARGET_FILL of screen height
+   *   feet  the feet must sit inside the lower half-FOV, with margin
+   */
+  _fitDistance(camY, floorY) {
+    // Vertical FOV straight from the projection matrix — in XR this is set by
+    // the device, not by our PerspectiveCamera's nominal 70 degrees.
+    const { cam } = this._camBasis();
+    const m = (cam.isArrayCamera ? cam.cameras?.[0] ?? cam : cam).projectionMatrix.elements[5];
+    const vFov = m > 0 ? 2 * Math.atan(1 / m) : THREE.MathUtils.degToRad(70);
+
+    const h = this.character?.height ?? 1.6;
+    const eye = Math.max(0.2, camY - floorY);
+
+    const dFill = (h / 2) / Math.tan((vFov * TARGET_FILL) / 2);
+    const dFeet = eye / Math.tan(vFov * 0.5 * 0.85);
+
+    return THREE.MathUtils.clamp(Math.max(dFill, dFeet), ...FIT_RANGE);
+  }
+
+  _floorY(camY) {
+    return this.session?.enabledFeatures?.includes('local-floor') ? 0 : camY - 1.35;
+  }
+
+  /** The spot it should be standing in: straight ahead, at the fit distance. */
+  _stationPoint() {
+    const { pos, fwd } = this._camBasis();
+    const floorY = this.placed ? this.floorY : this._floorY(pos.y);
+    const d = this._fitDistance(pos.y, floorY);
+    return new THREE.Vector3(pos.x + fwd.x * d, floorY, pos.z + fwd.z * d);
+  }
+
+  _inFrontOfCamera() {
+    return this._stationPoint();
   }
 
   // --- frame ---------------------------------------------------------------
@@ -204,7 +245,7 @@ export class RoomMode {
       this._searching = this.reticle.visible ? 0 : (this._searching ?? 0) + dt;
       this._updateReticle(frame);
     }
-    if (this.placed) this._wander(dt);
+    if (this.placed) this._follow(dt);
 
     this.character.update(dt);
     this.renderer.render(this.scene, this.camera);
@@ -246,47 +287,51 @@ export class RoomMode {
       : 'Move your phone slowly to scan the floor');
   }
 
-  /** Walk to a point, idle a while, pick another — all within WANDER_RADIUS. */
-  _wander(dt) {
+  /**
+   * Keep station in front of the camera.
+   *
+   * Still real AR — it walks the floor and stays anchored to it. But its target
+   * is wherever you are looking rather than a random point, so panning or
+   * walking makes it follow you instead of sliding out of frame. A deadzone
+   * stops it shuffling every time you breathe.
+   */
+  _follow(dt) {
     const root = this.character.root;
     this.contact.position.set(root.position.x, root.position.y + 0.005, root.position.z);
 
-    if (this.pause > 0) {
-      this.pause -= dt;
-      this.character.setLocomotion(0);
-      if (this.pause <= 0) this._pickTarget();
-      return;
-    }
-
-    const to = this.target.clone().sub(root.position);
+    const station = this._stationPoint();
+    const to = station.clone().sub(root.position);
     to.y = 0;
     const dist = to.length();
 
-    if (dist < 0.08) {
-      this.pause = THREE.MathUtils.randFloat(...PAUSE_RANGE);
+    const { pos: camPos } = this._camBasis();
+
+    if (dist <= FOLLOW_DEADZONE) {
+      // Settled: stand still and turn to face you.
       this.character.setLocomotion(0);
+      this._turnTowards(camPos.x - root.position.x, camPos.z - root.position.z, dt, 2.5);
       return;
     }
 
+    // Catch up faster the further behind it is, so a quick pan does not lose it.
+    const over = dist - FOLLOW_DEADZONE;
+    const speed = Math.min(FOLLOW_SPEED_MAX, 0.35 + over * 1.1);
+
     to.normalize();
-    root.position.addScaledVector(to, Math.min(WANDER_SPEED * dt, dist));
+    root.position.addScaledVector(to, Math.min(speed * dt, dist - FOLLOW_DEADZONE * 0.5));
+    root.position.y = this.floorY;
 
-    // Turn toward travel, capped so it pivots rather than snapping.
-    const want = Math.atan2(to.x, to.z);
+    this._turnTowards(to.x, to.z, dt, 3.5);
+    this.character.setLocomotion(THREE.MathUtils.clamp(speed / FOLLOW_SPEED_MAX, 0, 1) * 0.85);
+  }
+
+  /** Yaw toward a horizontal direction, rate-limited so it pivots. */
+  _turnTowards(dx, dz, dt, rate) {
+    if (Math.abs(dx) < 1e-5 && Math.abs(dz) < 1e-5) return;
+    const root = this.character.root;
+    const want = Math.atan2(dx, dz);
     const delta = Math.atan2(Math.sin(want - root.rotation.y), Math.cos(want - root.rotation.y));
-    root.rotation.y += THREE.MathUtils.clamp(delta, -3 * dt, 3 * dt);
-
-    // Ease down on approach so it doesn't stop mid-stride.
-    this.character.setLocomotion(THREE.MathUtils.clamp(dist / 0.45, 0, 1) * 0.42);
+    root.rotation.y += THREE.MathUtils.clamp(delta, -rate * dt, rate * dt);
   }
 
-  _pickTarget() {
-    const a = Math.random() * Math.PI * 2;
-    const r = Math.sqrt(Math.random()) * WANDER_RADIUS;
-    this.target.set(
-      this.home.x + Math.cos(a) * r,
-      this.home.y,
-      this.home.z + Math.sin(a) * r,
-    );
-  }
 }
