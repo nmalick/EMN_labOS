@@ -49,7 +49,11 @@ export class RoomMode {
     this.session = await navigator.xr.requestSession('immersive-ar', {
       requiredFeatures: ['hit-test'],
       // Requested but not required — the session still starts without them.
-      optionalFeatures: ['local-floor', 'anchors', 'plane-detection', 'light-estimation'],
+      // dom-overlay matters most: without it NO DOM is composited into the AR
+      // view, so the hint, the readout and every button are invisible and the
+      // only way out is the system back gesture.
+      optionalFeatures: ['local-floor', 'anchors', 'plane-detection', 'light-estimation', 'dom-overlay'],
+      domOverlay: { root: document.body },
     });
 
     await this.renderer.xr.setSession(this.session);
@@ -58,6 +62,15 @@ export class RoomMode {
     this.hitTestSource = await this.session.requestHitTestSource({ space: this.viewerSpace });
 
     this.session.addEventListener('select', () => this._onSelect());
+
+    // A tap on an overlay button also fires a session-level select, which would
+    // place the character underneath the UI. Cancel select for those taps.
+    this._onBeforeSelect = (e) => {
+      if (e.target.closest?.('.ctl, .hud')) e.preventDefault();
+    };
+    document.body.addEventListener('beforexrselect', this._onBeforeSelect);
+
+    this.overlayGranted = this.session.domOverlayState?.type != null;
     this.session.addEventListener('end', () => { this.onExit(); });
 
     this.hint?.classList.remove('hidden');
@@ -68,6 +81,10 @@ export class RoomMode {
   async stop() {
     this.renderer?.setAnimationLoop(null);
     this.hint?.classList.add('hidden');
+    if (this._onBeforeSelect) {
+      document.body.removeEventListener('beforexrselect', this._onBeforeSelect);
+      this._onBeforeSelect = null;
+    }
     this.hitTestSource?.cancel?.();
     this.hitTestSource = null;
     try { await this.session?.end(); } catch { /* already ending */ }
@@ -152,7 +169,10 @@ export class RoomMode {
     const dt = Math.min(this.clock.getDelta(), 0.1);
     this._fps = this._fps * 0.9 + (dt > 0 ? (1 / dt) * 0.1 : 0);
 
-    if (frame && !this.placed) this._updateReticle(frame);
+    if (frame && !this.placed) {
+      this._searching = this.reticle.visible ? 0 : (this._searching ?? 0) + dt;
+      this._updateReticle(frame);
+    }
     if (this.placed) this._wander(dt);
 
     this.character.update(dt);
@@ -166,6 +186,11 @@ export class RoomMode {
     }
   }
 
+  _setHint(text) {
+    if (!this.hint || this.hint.textContent === text) return;
+    this.hint.textContent = text;
+  }
+
   _updateReticle(frame) {
     const refSpace = this.renderer.xr.getReferenceSpace();
     const hits = frame.getHitTestResults(this.hitTestSource);
@@ -175,10 +200,17 @@ export class RoomMode {
       if (pose) {
         this.reticle.visible = true;
         this.reticle.matrix.fromArray(pose.transform.matrix);
+        this._setHint('Tap to place');
         return;
       }
     }
+
     this.reticle.visible = false;
+    // ARCore needs parallax before it can find a surface, so the honest
+    // instruction while searching is "move", not "point".
+    this._setHint(this._searching > 4
+      ? 'Still searching — try a textured floor in better light'
+      : 'Move your phone slowly to scan the floor');
   }
 
   /** Walk to a point, idle a while, pick another — all within WANDER_RADIUS. */
