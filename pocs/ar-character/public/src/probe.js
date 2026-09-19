@@ -33,7 +33,15 @@ export async function probe() {
 
   // A mode is only offered when everything it hard-requires is present.
   caps.roadReady = caps.secure && caps.camera && caps.webgl2;
+  // Stage is deliberately the low-requirement mode: camera and a canvas, no
+  // tracking of any kind, so it runs anywhere Road does — iPhone included.
+  caps.stageReady = caps.roadReady;
   caps.roomReady = caps.secure && caps.immersiveAR && caps.webgl2;
+
+  caps.stageBlocker = !caps.secure ? SECURE_HINT
+    : !caps.camera ? 'no camera API'
+    : !caps.webgl2 ? 'no WebGL2'
+    : null;
 
   caps.roadBlocker = !caps.secure ? SECURE_HINT
     : !caps.camera ? 'no camera API'

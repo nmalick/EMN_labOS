@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Character } from '../character.js';
 import { FlowEstimator } from '../perception/flow.js';
 import { ObstacleTracker } from '../perception/obstacles.js';
+import { Torch } from '../torch.js';
 
 /**
  * Road mode — character composited over the live camera feed.
@@ -33,6 +34,7 @@ export class RoadMode {
     this.onStatus = onStatus ?? (() => {});
 
     this.stream = null;
+    this.torch = null;
     this.running = false;
     this.clock = new THREE.Clock();
 
@@ -67,6 +69,8 @@ export class RoadMode {
     this.video.classList.remove('hidden');
     await this.video.play();
 
+    this.torch = new Torch(this.stream);
+
     this.onStatus('starting sensors');
     await this._startOrientation();
     this._startGeolocation();
@@ -95,6 +99,7 @@ export class RoadMode {
     window.removeEventListener('resize', this._onScreen);
     if (this._geoWatch != null) navigator.geolocation.clearWatch(this._geoWatch);
 
+    this.torch?.off();
     this.stream?.getTracks().forEach((t) => t.stop());
     this.video.srcObject = null;
     this.video.classList.add('hidden');
@@ -105,6 +110,9 @@ export class RoadMode {
 
   /** Fire an emote on demand (the wave button). */
   emote(name = 'Wave') { this.character?.trigger(name); }
+
+  get torchAvailable() { return !!this.torch?.available; }
+  async toggleTorch() { return this.torch ? this.torch.toggle() : false; }
 
   // --- scene ---------------------------------------------------------------
 

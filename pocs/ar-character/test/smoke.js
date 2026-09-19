@@ -158,6 +158,55 @@ const check = (name, pass, detail = '') => {
     const emoted = await page.evaluate(() => document.getElementById('hud-state').textContent);
     check('one-shot emote fires', emoted === 'Wave' || emoted === 'Idle', emoted);
 
+    // --- stage mode --------------------------------------------------------
+    // Unlike Room, Stage needs no WebXR, so headless can exercise it fully --
+    // including its whole reason for existing: the character cannot leave the
+    // screen. Sampled over time because it walks.
+    await page.click('#btn-back');
+    await page.waitForTimeout(600);
+    await page.click('#pick-stage');
+    await page.waitForFunction(
+      () => document.getElementById('boot').classList.contains('hidden'),
+      null, { timeout: 25000 });
+    check('Stage mode started', true);
+
+    const samples = await page.evaluate(async () => {
+      const a = window.__ar;
+      const THREE_UP = 0.5;
+      const out = [];
+      for (let i = 0; i < 40; i++) {
+        await new Promise((r) => setTimeout(r, 100));
+        const p = a.character.root.position.clone();
+        p.y += a.character.height * THREE_UP;
+        p.project(a.camera);
+        out.push({
+          x: (p.x + 1) / 2,
+          y: (-p.y + 1) / 2,
+          z: -a.character.root.position.z,
+          visible: a.character.root.visible,
+        });
+      }
+      return out;
+    });
+
+    const offScreen = samples.filter((s) => s.x < 0 || s.x > 1 || s.y < 0 || s.y > 1);
+    check('Stage character never leaves the screen',
+      offScreen.length === 0,
+      `${samples.length} samples over 4s, ${offScreen.length} off-screen`);
+
+    const xs = samples.map((s) => s.x);
+    const zs = samples.map((s) => s.z);
+    check('Stage character is actually moving',
+      Math.max(...xs) - Math.min(...xs) > 0.01 || Math.max(...zs) - Math.min(...zs) > 0.05,
+      `x span ${(Math.max(...xs) - Math.min(...xs)).toFixed(2)}, depth span ${
+        (Math.max(...zs) - Math.min(...zs)).toFixed(2)}m`);
+
+    check('Stage character is visible', samples.every((s) => s.visible));
+
+    const torchHidden = await page.$eval('#btn-torch', (b) => b.classList.contains('hidden'));
+    check('torch button hidden when device has no torch', torchHidden,
+      'synthetic camera exposes no torch capability');
+
     // --- teardown ----------------------------------------------------------
     await page.click('#btn-back');
     await page.waitForTimeout(600);

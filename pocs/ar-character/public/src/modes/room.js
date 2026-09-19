@@ -95,6 +95,9 @@ export class RoomMode {
     this.renderer?.dispose();
   }
 
+  // Inside a WebXR session the UA owns the camera; there is no torch hook.
+  get torchAvailable() { return false; }
+
   emote(name = 'Wave') {
     // Never a dead button: before placement, this places the character (which
     // waves on arrival) rather than silently doing nothing.

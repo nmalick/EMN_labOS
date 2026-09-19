@@ -18,6 +18,15 @@
   </header>
 
   <div class="modes">
+    <button class="mode-card" id="pick-stage" disabled>
+      <span class="mode-icon" aria-hidden="true">&#9645;</span>
+      <span class="mode-body">
+        <span class="mode-name">Stage</span>
+        <span class="mode-desc">A bounded patch of floor locked to your screen. The character walks around inside it and cannot wander off.</span>
+      </span>
+      <span class="mode-state" data-state>checking&hellip;</span>
+    </button>
+
     <button class="mode-card" id="pick-road" disabled>
       <span class="mode-icon" aria-hidden="true">&#9673;</span>
       <span class="mode-body">
@@ -67,6 +76,7 @@
     <div class="stage-controls">
       <button id="btn-back" class="ctl" title="Back">&#8592;</button>
       <button id="btn-hud" class="ctl" title="Toggle readout">&#9636;</button>
+      <button id="btn-torch" class="ctl hidden" title="Flashlight" aria-pressed="false">&#128161;</button>
       <button id="btn-wave" class="ctl" title="Wave">&#9995;</button>
     </div>
   </div>

@@ -1,10 +1,11 @@
 # ar-character
 
 An animated character composited into your real surroundings through the phone camera.
-Two modes, because the two situations are not the same problem.
+Three modes, because these are not the same problem.
 
 | Mode | Situation | Technique |
 |---|---|---|
+| **Stage** | Anywhere, no tracking at all | Camera feed + a floor rectangle computed from the frustum; the character cannot leave the screen |
 | **Road** | Phone pointed out a car window | Camera feed + screen-composited character, driven by optical flow |
 | **Room** | Standing in a room | WebXR `immersive-ar` with hit-test, world anchoring, camera-following |
 
@@ -86,7 +87,9 @@ public/
   src/
     main.js               probe, mode routing, lazy-loads the chosen mode
     probe.js              device capability detection
-    character.js          GLB + animation state machine   (shared by both modes)
+    character.js          GLB + animation state machine   (shared by all modes)
+    torch.js              flashlight, where the camera track is ours
+    modes/stage.js        bounded floor rectangle, screen-locked
     modes/road.js         camera composite, gyro, gait, parkour
     modes/room.js         WebXR hit-test, placement, camera-following
     perception/flow.js    sparse optical flow (block matching)
@@ -96,6 +99,30 @@ public/
 ```
 
 Everything is vendored. No build step, no bundler, no network calls at runtime.
+
+## Stage mode, and why it exists
+
+Room mode is real AR, and it lives or dies by ARCore's tracking: if hit-test cannot lock
+your floor, nothing happens, and once anchored the character will happily stand behind you.
+
+Stage mode gives all that up deliberately. The camera never moves, so **the visible frame IS
+the stage**. The character walks a floor rectangle derived from the actual view frustum —
+near bound set by whichever of feet or head leaves the view first, width tapering with depth
+because the frustum does — so by construction it cannot walk off screen. No session, no
+hit-test, no tracking, nothing to fail.
+
+The trade is honest: it moves with the phone instead of staying put in the room. That is the
+price of always working. Tap anywhere to send it to that spot.
+
+Because it needs only `getUserMedia`, Stage also runs on iPhone.
+
+## Torch
+
+Modes that own the camera track (Stage, Road) expose a flashlight button, via the `torch`
+MediaTrackCapability. It is absent on iOS Safari and on some Android builds, and some devices
+advertise it then refuse it — so the button is shown only after the capability is confirmed,
+and hides itself if applying the constraint fails. Room mode cannot offer it at all: inside a
+WebXR session the UA owns the camera and there is no torch hook.
 
 ## Framing in Room mode
 

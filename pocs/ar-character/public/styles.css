@@ -114,6 +114,11 @@ html, body {
   cursor: pointer;
 }
 .ctl:active { background: rgba(94,234,212,.22); }
+.ctl[aria-pressed="true"] {
+  background: rgba(251,191,36,.9);
+  border-color: rgba(251,191,36,1);
+  color: #1a1400;
+}
 
 .hud {
   position: absolute; top: max(14px, env(safe-area-inset-top)); left: var(--gutter);

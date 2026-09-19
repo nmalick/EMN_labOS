@@ -18,6 +18,7 @@ const ui = {
   boot: $('boot'),
   bootMsg: $('boot-msg'),
   hudEl: $('hud'),
+  torchBtn: $('btn-torch'),
   hud: {
     speed: $('hud-speed'),
     state: $('hud-state'),
@@ -34,12 +35,14 @@ async function init() {
   const caps = await probe();
   renderProbe(caps);
 
+  wireMode($('pick-stage'), caps.stageReady, caps.stageBlocker, () => enter('stage'));
   wireMode($('pick-road'), caps.roadReady, caps.roadBlocker, () => enter('road'));
   wireMode($('pick-room'), caps.roomReady, caps.roomBlocker, () => enter('room'));
 
   $('btn-back').addEventListener('click', exit);
   $('btn-hud').addEventListener('click', () => ui.hudEl.classList.toggle('hidden'));
   $('btn-wave').addEventListener('click', () => active?.emote('Wave'));
+  ui.torchBtn.addEventListener('click', toggleTorch);
 }
 
 function wireMode(btn, ready, blocker, onPick) {
@@ -63,7 +66,15 @@ async function enter(mode) {
   status('starting');
 
   try {
-    if (mode === 'road') {
+    if (mode === 'stage') {
+      const { StageMode } = await import('./modes/stage.js');
+      active = new StageMode({
+        video: ui.video,
+        canvas: ui.canvas,
+        hud: ui.hud,
+        onStatus: status,
+      });
+    } else if (mode === 'road') {
       const { RoadMode } = await import('./modes/road.js');
       active = new RoadMode({
         video: ui.video,
@@ -84,6 +95,11 @@ async function enter(mode) {
     await active.start();
     // Handle for the headless smoke test / console debugging.
     window.__ar = active;
+
+    // Torch is only possible where we own the camera track, and only on
+    // devices that actually expose the capability. Offer it nowhere else.
+    ui.torchBtn.classList.toggle('hidden', !active.torchAvailable);
+    ui.torchBtn.setAttribute('aria-pressed', 'false');
   } catch (err) {
     console.error(err);
     status(null);
@@ -96,8 +112,18 @@ async function exit() {
   active = null;
   ui.toast.classList.add('hidden');
   ui.hudEl.classList.add('hidden');
+  ui.torchBtn.classList.add('hidden');
+  ui.torchBtn.setAttribute('aria-pressed', 'false');
   ui.stage.classList.add('hidden');
   ui.launch.classList.remove('hidden');
+}
+
+async function toggleTorch() {
+  if (!active?.toggleTorch) return;
+  const on = await active.toggleTorch();
+  ui.torchBtn.setAttribute('aria-pressed', String(on));
+  // A device can advertise torch and then refuse it; hide rather than lie.
+  if (!active.torchAvailable) ui.torchBtn.classList.add('hidden');
 }
 
 function status(msg) {
