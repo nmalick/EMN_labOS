@@ -72,6 +72,7 @@ async function enter(mode) {
         video: ui.video,
         canvas: ui.canvas,
         hud: ui.hud,
+        hint: ui.hint,
         onStatus: status,
       });
     } else if (mode === 'road') {

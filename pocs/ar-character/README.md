@@ -116,6 +116,21 @@ price of always working. Tap anywhere to send it to that spot.
 
 Because it needs only `getUserMedia`, Stage also runs on iPhone.
 
+### Sizing
+
+Apparent size is chosen **first**, and the geometry is derived from it — not the other way
+round. The earlier version assumed the phone was 1.4m above a floor and solved for a distance
+that kept the feet in frame; that forced the character out to 3-5m regardless of what you
+were pointing at, so held a metre from a worktop it read as plainly the wrong size. The
+assumption was wrong, not the arithmetic. Stage mode is a stage, so there is no real floor to
+be faithful to.
+
+**Pinch to resize** (15%-75% of screen height); the choice persists in `localStorage`. From
+the chosen fill it derives the distance — `d = h / (2 * F * tan(vFov/2))`, a screen-fraction
+not an angular one — and the camera height, so the feet land at a consistent spot. Sizes that
+would not fit push the feet lower instead of clipping the head, and the margin is budgeted
+against the *near* end of the walk band, since the character grows as it walks toward you.
+
 ## Torch
 
 Modes that own the camera track (Stage, Road) expose a flashlight button, via the `torch`

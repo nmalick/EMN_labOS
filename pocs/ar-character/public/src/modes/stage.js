@@ -18,19 +18,35 @@ import { Torch } from '../torch.js';
  * Needs only getUserMedia, so unlike Room mode this also runs on iPhone.
  */
 
-const CAM_HEIGHT = 1.4;        // where the phone is, metres above the floor
-const SAFE_V = 0.80;           // fraction of the vertical half-FOV we will use
-const SAFE_H = 0.70;           // and horizontal — keeps it off the edges
-const DEPTH_SPAN = 1.8;        // far bound as a multiple of the near bound
+// Apparent size is chosen FIRST, and the geometry is derived from it.
+//
+// The earlier version did the reverse: it assumed the phone was 1.4m above a
+// floor and solved for a distance that kept the feet in frame. That forced the
+// character out to 3-5m no matter what you were pointing at, so held a metre
+// from a worktop it read as the wrong size — because the assumption, not the
+// maths, was wrong. Stage mode is a stage, not a room, so there is no real
+// floor to be faithful to.
+const FILL_DEFAULT = 0.45;     // fraction of screen height the body occupies
+const FILL_RANGE = [0.15, 0.75];   // 0.75/0.90 + HEAD_MARGIN = FEET_MAX
+const FEET_AT = 0.74;          // where the feet sit, as a fraction down the screen
+const FEET_MAX = 0.92;         // ...but they give way when the body needs the room
+const HEAD_MARGIN = 0.06;      // keep this much clear above the head
+const SAFE_H = 0.70;           // horizontal margin — keeps it off the edges
+// Walkable depth, as a multiple of the set distance. Kept tight on purpose:
+// the character's apparent size varies as 1/depth, so a wide band makes the
+// size you pinched drift away as it walks. +/-11% is not noticeable.
+const DEPTH_SPAN = [0.90, 1.12];
 const EDGE_PAD = 0.30;         // metres reserved for the character's own width
 const WALK_SPEED = 0.55;
 const PAUSE_RANGE = [1.2, 3.2];
+const FILL_STORE = 'ar-character.stage.fill';
 
 export class StageMode {
-  constructor({ video, canvas, hud, onStatus }) {
+  constructor({ video, canvas, hud, hint, onStatus }) {
     this.video = video;
     this.canvas = canvas;
     this.hud = hud;
+    this.hint = hint;
     this.onStatus = onStatus ?? (() => {});
 
     this.stream = null;
@@ -40,10 +56,19 @@ export class StageMode {
 
     this.target = new THREE.Vector3();
     this.pause = 0.8;
+
+    let stored = NaN;
+    try { stored = parseFloat(localStorage.getItem(FILL_STORE)); } catch { /* private mode */ }
+    this.fill = Number.isFinite(stored) ? stored : FILL_DEFAULT;
+    this.pinch = null;
     this._fps = 0;
 
+    this.pointers = new Map();
+
     this._onResize = () => this._resize();
-    this._onTap = (e) => this._tap(e);
+    this._onDown = (e) => this._down(e);
+    this._onMove = (e) => this._move(e);
+    this._onUp = (e) => this._up(e);
   }
 
   async start() {
@@ -69,11 +94,21 @@ export class StageMode {
     this.scene.add(this.character.root);
 
     this._computeBounds();
-    this.character.root.position.set(0, 0, -this.bounds.zNear * 1.15);
+    this.character.root.position.set(0, 0, -this.bounds.distance);
     this._pickTarget();
 
     addEventListener('resize', this._onResize);
-    this.canvas.addEventListener('pointerdown', this._onTap);
+    this.canvas.addEventListener('pointerdown', this._onDown);
+    this.canvas.addEventListener('pointermove', this._onMove);
+    this.canvas.addEventListener('pointerup', this._onUp);
+    this.canvas.addEventListener('pointercancel', this._onUp);
+
+    // Pinch is not discoverable, so say it once.
+    if (this.hint) {
+      this.hint.textContent = 'Pinch to resize · tap to move';
+      this.hint.classList.remove('hidden');
+      this._hintTimer = setTimeout(() => this.hint.classList.add('hidden'), 4500);
+    }
 
     this.running = true;
     this.clock.start();
@@ -85,7 +120,12 @@ export class StageMode {
     this.running = false;
     this.renderer?.setAnimationLoop(null);
     removeEventListener('resize', this._onResize);
-    this.canvas.removeEventListener('pointerdown', this._onTap);
+    this.canvas.removeEventListener('pointerdown', this._onDown);
+    this.canvas.removeEventListener('pointermove', this._onMove);
+    this.canvas.removeEventListener('pointerup', this._onUp);
+    this.canvas.removeEventListener('pointercancel', this._onUp);
+    clearTimeout(this._hintTimer);
+    this.hint?.classList.add('hidden');
 
     await this.torch?.off();
     this.stream?.getTracks().forEach((t) => t.stop());
@@ -116,7 +156,7 @@ export class StageMode {
 
     // Fixed. Never rotated — that is what makes the frame a stage.
     this.camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.05, 60);
-    this.camera.position.set(0, CAM_HEIGHT, 0);
+    this.camera.position.set(0, 1, 0);   // replaced by _computeBounds()
 
     this.scene.add(new THREE.HemisphereLight(0xf2f6ff, 0x6b6357, 2.3));
     const key = new THREE.DirectionalLight(0xfff6e8, 1.6);
@@ -133,27 +173,64 @@ export class StageMode {
   }
 
   /**
-   * The floor rectangle that is actually on screen.
+   * Geometry from the chosen apparent size.
    *
-   * Near bound: close enough and the feet fall below the bottom edge, so it is
-   * set by whichever of feet or head leaves the frustum first. Width tapers
-   * with depth because the frustum does.
+   *   distance    so the body subtends `fill` of the vertical FOV
+   *   cameraY     so the feet land at FEET_AT down the screen, which keeps the
+   *               framing identical at every size
+   *   width       tapers with depth, because the frustum does
    */
   _computeBounds() {
     const vFov = THREE.MathUtils.degToRad(this.camera.fov);
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * this.camera.aspect);
     const h = this.character?.height ?? 1.6;
 
-    const vLimit = Math.tan((vFov / 2) * SAFE_V);
-    const zFeet = CAM_HEIGHT / vLimit;
-    const zHead = h > CAM_HEIGHT ? (h - CAM_HEIGHT) / vLimit : 0;
+    // Fraction of screen HEIGHT, not of the FOV angle. Screen position is
+    // tan-based, so solving `body subtends vFov*fill degrees` is a different
+    // (and wrong) quantity: it undershot by a few percent at every size.
+    //   screenFrac = h / (2 * d * tan(vFov/2))   =>   d = h / (2 * F * tan(vFov/2))
+    const d = h / (2 * this.fill * Math.tan(vFov / 2));
 
-    const zNear = Math.max(zFeet, zHead, 1.2);
+    // Feet sit at FEET_AT, except when the body is too tall to fit above that
+    // — then they drop far enough to keep the head on screen. Small and medium
+    // sizes therefore keep identical framing; only large ones shift down.
+    //
+    // Budget for the NEAR end of the walk band, not the nominal distance: the
+    // character grows by 1/DEPTH_SPAN[0] as it walks toward you, and sizing the
+    // margin off nominal let the head clip the top once it did.
+    const worstFill = this.fill / DEPTH_SPAN[0];
+    const feetAt = Math.min(FEET_MAX, Math.max(FEET_AT, worstFill + HEAD_MARGIN));
+    const ndcDown = (feetAt - 0.5) * 2;
+    const camY = d * Math.tan(Math.atan(ndcDown * Math.tan(vFov / 2)));
+    this.camera.position.y = Math.max(0.15, camY);
+
     this.bounds = {
-      zNear,
-      zFar: zNear * DEPTH_SPAN,
-      halfAt: (z) => Math.max(0.1, z * Math.tan(hFov / 2) * SAFE_H - EDGE_PAD),
+      distance: d,
+      zNear: d * DEPTH_SPAN[0],
+      zFar: d * DEPTH_SPAN[1],
+      halfAt: (z) => Math.max(0.08, z * Math.tan(hFov / 2) * SAFE_H - EDGE_PAD),
     };
+  }
+
+  /** Change apparent size, keeping the character in view and on the floor. */
+  setFill(fill) {
+    this.fill = THREE.MathUtils.clamp(fill, ...FILL_RANGE);
+    try { localStorage.setItem(FILL_STORE, String(this.fill)); } catch { /* private mode */ }
+
+    const before = this.bounds?.distance ?? 1;
+    this._computeBounds();
+
+    // Scale the character's position with the new distance so it does not jump
+    // sideways or teleport out of the walkable band when you pinch.
+    const k = this.bounds.distance / before;
+    const root = this.character?.root;
+    if (root) {
+      root.position.x *= k;
+      root.position.z *= k;
+      this._clamp(root.position);
+    }
+    this.target.multiplyScalar(k);
+    this._clamp(this.target);
   }
 
   _resize() {
@@ -176,6 +253,56 @@ export class StageMode {
   }
 
   // --- interaction ---------------------------------------------------------
+
+  _down(e) {
+    this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    this.canvas.setPointerCapture?.(e.pointerId);
+
+    if (this.pointers.size === 2) {
+      this.pinch = { span: this._span(), fill: this.fill };
+      this._moved = true;   // a pinch is never also a tap
+    } else if (this.pointers.size === 1) {
+      this._downAt = { x: e.clientX, y: e.clientY };
+      this._moved = false;
+    }
+  }
+
+  _move(e) {
+    if (!this.pointers.has(e.pointerId)) return;
+    this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (this.pinch && this.pointers.size >= 2) {
+      const span = this._span();
+      if (span > 0 && this.pinch.span > 0) {
+        this.setFill(this.pinch.fill * (span / this.pinch.span));
+      }
+      return;
+    }
+
+    // A drag is not a tap.
+    if (this._downAt) {
+      const dx = e.clientX - this._downAt.x;
+      const dy = e.clientY - this._downAt.y;
+      if (dx * dx + dy * dy > 144) this._moved = true;
+    }
+  }
+
+  _up(e) {
+    this.pointers.delete(e.pointerId);
+    if (this.pointers.size < 2) this.pinch = null;
+
+    if (this.pointers.size === 0 && !this._moved && this._downAt) {
+      this._tap({ clientX: this._downAt.x, clientY: this._downAt.y });
+    }
+    if (this.pointers.size === 0) this._downAt = null;
+  }
+
+  /** Distance between the two active pointers. */
+  _span() {
+    const [a, b] = [...this.pointers.values()];
+    if (!a || !b) return 0;
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
 
   /** Tap the floor to send it there. */
   _tap(e) {
@@ -256,7 +383,7 @@ export class StageMode {
     const p = this.character.root.position;
     this.hud.speed.textContent = this.character.speed.toFixed(2);
     this.hud.state.textContent = this.character.state;
-    this.hud.obs.textContent = `${(-p.z).toFixed(1)}m`;
+    this.hud.obs.textContent = `${Math.round(this.fill * 100)}% · ${(-p.z).toFixed(1)}m`;
     this.hud.fps.textContent = this._fps.toFixed(0);
   }
 }

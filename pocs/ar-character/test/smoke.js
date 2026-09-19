@@ -203,6 +203,71 @@ const check = (name, pass, detail = '') => {
 
     check('Stage character is visible', samples.every((s) => s.visible));
 
+    // Resizing is the whole point of the pinch control: assert the character's
+    // ON-SCREEN height actually tracks the requested fill, and that the framing
+    // (where the feet sit) stays put across the range rather than drifting.
+    const sizes = await page.evaluate(async () => {
+      const a = window.__ar;
+      const THREE_FEET = 0;
+      const out = [];
+      for (const fill of [0.2, 0.45, 0.8]) {
+        a.setFill(fill);
+        await new Promise((r) => setTimeout(r, 120));
+        const root = a.character.root.position;
+        const feet = new (a.character.root.position.constructor)(root.x, THREE_FEET, root.z);
+        const head = new (a.character.root.position.constructor)(root.x, a.character.height, root.z);
+        feet.project(a.camera); head.project(a.camera);
+        const fy = (-feet.y + 1) / 2, hy = (-head.y + 1) / 2;
+        out.push({ fill, screenHeight: Math.abs(fy - hy), feetAt: fy, onScreen: fy <= 1.02 && hy >= -0.02 });
+      }
+      return out;
+    });
+    console.log(sizes.map((s) =>
+      `         fill ${s.fill} -> ${(s.screenHeight * 100).toFixed(0)}% of screen, feet at ${(s.feetAt * 100).toFixed(0)}%`).join('\n'));
+
+    // Relative tolerance, because the character walks a +/-11% depth band and
+    // apparent size goes as 1/depth. Anything outside that is a real error.
+    const worst = Math.max(...sizes.map((s) => Math.abs(s.screenHeight - s.fill) / s.fill));
+    check('on-screen size tracks the requested fill', worst < 0.15,
+      `${sizes.map((s) => `${s.fill}->${s.screenHeight.toFixed(2)}`).join(' ')} (worst ${(worst * 100).toFixed(0)}% off)`);
+
+    // Framing is fixed for sizes that fit above the default feet line, and
+    // deliberately gives way for ones that do not — so assert the invariant
+    // that actually matters: the feet stay low in frame and never leave it.
+    const small = sizes.filter((s) => s.fill <= 0.45).map((s) => s.feetAt);
+    check('framing is stable across normal sizes',
+      Math.max(...small) - Math.min(...small) < 0.03,
+      `varies by ${((Math.max(...small) - Math.min(...small)) * 100).toFixed(1)}%`);
+    check('feet stay low in frame at every size',
+      sizes.every((s) => s.feetAt > 0.55 && s.feetAt <= 0.95),
+      sizes.map((s) => `${(s.feetAt * 100).toFixed(0)}%`).join(' '));
+
+    check('stays on screen at every size', sizes.every((s) => s.onScreen));
+
+    // The size checks above sample immediately after resizing. The character
+    // then WALKS, growing as it comes nearer — which is how the head came to
+    // clip the top at large sizes. So re-check at maximum size, over time.
+    const bigSamples = await page.evaluate(async () => {
+      const a = window.__ar;
+      a.setFill(0.75);
+      const out = [];
+      for (let i = 0; i < 30; i++) {
+        await new Promise((r) => setTimeout(r, 100));
+        const root = a.character.root.position;
+        const head = new (root.constructor)(root.x, a.character.height, root.z);
+        const feet = new (root.constructor)(root.x, 0, root.z);
+        head.project(a.camera); feet.project(a.camera);
+        out.push({ headY: (-head.y + 1) / 2, feetY: (-feet.y + 1) / 2 });
+      }
+      return out;
+    });
+    const clipped = bigSamples.filter((s) => s.headY < 0 || s.feetY > 1);
+    check('stays fully framed at max size while walking', clipped.length === 0,
+      `${bigSamples.length} samples, ${clipped.length} clipped, head as high as ${
+        (Math.min(...bigSamples.map((s) => s.headY)) * 100).toFixed(1)}%`);
+
+    await page.evaluate(() => window.__ar.setFill(0.45));
+
     const torchHidden = await page.$eval('#btn-torch', (b) => b.classList.contains('hidden'));
     check('torch button hidden when device has no torch', torchHidden,
       'synthetic camera exposes no torch capability');
