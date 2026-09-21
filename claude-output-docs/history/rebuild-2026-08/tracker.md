@@ -8,7 +8,7 @@
 |---|---|---|---|---|---|
 | 0.1 | 0 | Archive dir + 22 reports preserved | ✅ | — | `~/Archive/labos-rebuild-2026-08/reports/` (prefixed, collision fixed) |
 | 0.2 | 0 | `~/.claude` config backup | ✅ | — | rsync, 7.2MB, transcripts excluded |
-| 0.3 | 0 | emnlabs history rescue | ✅ | — | Tags `archive/pre-reset-main` (a69bfef) + `archive/opportunity-tool` (57e9d9d); 75MB bundle verified, **credential-bearing — never push/share**; gc disabled during op |
+| 0.3 | 0 | emnlabs history rescue | ✅ | — | Tags `archive/pre-reset-main` (a69bfef) + `archive/split-spa` (57e9d9d); 75MB bundle verified, **credential-bearing — never push/share**; gc disabled during op |
 | 0.4a | 0 | Per-repo fetch/bundle/fsck | ✅ | — | 6/6 bundles verified OK. Qari 42 unreachable objects (recorded); others 0 |
 | 0.4b | 0 | Stash exports | ✅ | — | Qari ×2, bil ×1 → `stash-patches/` (first bil export was mis-cd'd, redone correctly); stashes kept in repos |
 | 0.4c | 0 | bil-app dirty-tree rescue | ✅ | `bil-app@3f96724` | 8 files, 786+/770− → `wip/rescue-2026-08`, pushed; main clean |
@@ -30,7 +30,7 @@
 | 2.0 | 2 | .gitignore surgery + tripwire | ✅ | `a6a8f1d` | /.github/ + /tests/ allowlisted (tripwire caught BOTH gaps live: canary file, then tests/); .claude narrowed; env anchored; check-tracked.sh in CI |
 | 2.1 | 2 | Generator v2 + registry lib | ✅ | `0bc2a10` | Shared lib (single ROOT, loud validate); showcase eligibility (catalog 2→5); one allowlist path; deterministic + --check; 7/7 default-deny tests; ai-ops.html + projects-corpus.json + pointer indexes |
 | 2.2 | 2 | Manifest policy reconciled | ✅ | `0bc2a10` | repo_public gating: 1 public row; 4 private/client rows → gitignored manifest.local.sh |
-| 2.3 | 2 | CI + freshness gate + registry contract + opportunity_tool | ✅ | `b7626b2` | Catalog 5→6 (live deployed project was invisible); per-field publication decisions recorded |
+| 2.3 | 2 | CI + freshness gate + registry contract | ✅ | `b7626b2` | Catalog 5→6; per-field publication decisions recorded |
 | 2.4 | 2 | doc-kit templates v1 | ✅ | `06b0c13` | Full kit incl. cursor-headed arch template, event-typed history, T1/T2/T3 backlog, PR convention, ci-baseline with docs-freshness job |
 | 2.5 | 2 | Umbrella doc corrections | ✅ | `a996afe` | DIRECTORY/CLAUDE/now/os-design/taxonomy — the 10-row checklist |
 | 2.6a | 2 | Pages + metadata + push protection | ✅ | — | Pages live at nmalick.github.io/EMN_labOS (serves pre-rebuild docs from main until merge — recap note); push protection on both public repos |
