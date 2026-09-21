@@ -4,4 +4,11 @@
 
 _Generated pointer into the project's own `project-os/`; content lives in the project repo._
 
-_No project-os doc kit yet (pre-baseline)._
+> Repo**: nmalick/art_is_everywear · **Last commit checked**: `5ff8d13` (2026-07-19) · **Last updated**: 2026-08-03
+
+| Doc | Contains | Reference when |
+| engineering/architecture.md | Code-verified architecture: App Router routes, the seed/demo overlay, Firebase data model, admin gating, the 4 privileged workflows | Any stack/structure question — BEFORE code |
+| product/features.md | Feature inventory — the made-to-order flow (current) vs the pivoted-away checkout (README-era) | What the storefront does today |
+| history/2025-2026.md | Event log (41 commits): Firebase arc, admin roles, the checkout→made-to-order pivot; decisions | Why it's this way |
+| plans/improvement-backlog.md | T1/T2/T3 (client-additive-safe only) + dependency debt | Before any change |
+| ops/deploy.md · verify.md · backup.md · secrets.md | Deploy runbook (4 Firebase workflows) · verify · **client-data DR (orders — PITR ACTION-REQUIRED)** · secrets by name | Deploy/ops/DR |

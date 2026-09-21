@@ -15,8 +15,8 @@
     "highlights": [],
     "showcase": true,
     "doc_index": {
-      "has_kit": false,
-      "cursor": ""
+      "has_kit": true,
+      "cursor": "Repo**: nmalick/Qari \u00b7 **Last commit checked**: `00b7558` (2026-08-02) \u00b7 **Last updated**: 2026-08-03"
     }
   },
   {
@@ -35,8 +35,8 @@
     "summary": "Storefront for original artwork and small-batch apparel \u2014 made-to-order requests with a Firebase-backed catalog and admin.",
     "highlights": [],
     "doc_index": {
-      "has_kit": false,
-      "cursor": ""
+      "has_kit": true,
+      "cursor": "Repo**: nmalick/art_is_everywear \u00b7 **Last commit checked**: `5ff8d13` (2026-07-19) \u00b7 **Last updated**: 2026-08-03"
     }
   },
   {
@@ -55,8 +55,8 @@
     "highlights": [],
     "showcase": true,
     "doc_index": {
-      "has_kit": false,
-      "cursor": ""
+      "has_kit": true,
+      "cursor": "Repo**: nmalick/bil-app \u00b7 **Last commit checked**: `d8d4090` (2026-06-28) \u00b7 **Last updated**: 2026-08-03"
     }
   },
   {
@@ -74,8 +74,8 @@
     "summary": "Personal portfolio and EMN Labs showcase site.",
     "highlights": [],
     "doc_index": {
-      "has_kit": false,
-      "cursor": ""
+      "has_kit": true,
+      "cursor": "Repo**: nmalick/emnlabs_site \u00b7 **Last commit checked**: `ac17262` (2026-07-19) \u00b7 **Last updated**: 2026-08-03"
     }
   },
   {
@@ -111,8 +111,8 @@
     "showcase": true,
     "repo_url": "https://github.com/nmalick/qari-assets",
     "doc_index": {
-      "has_kit": false,
-      "cursor": ""
+      "has_kit": true,
+      "cursor": "Repo**: nmalick/qari-assets \u00b7 **Last commit checked**: `4f8972d` (2026-06-28) \u00b7 **Last updated**: 2026-08-02"
     }
   }
 ]

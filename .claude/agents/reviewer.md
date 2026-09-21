@@ -26,6 +26,13 @@ FOUR DIMENSIONS (each PASS / FAIL-blocking / FAIL-advisory):
    simulator UDIDs, wrong git author, secret-shaped strings. For PUBLIC_BOUND=yes, apply the
    strictest read. ANY leakage finding is blocking regardless of the other dimensions.
 
+> **Past learning (2026-08):** two live-blanking defects shipped through SHIP verdicts because
+> review stopped at build/lint gates. For changes touching web-app components, demand RENDER
+> evidence (dev-server or preview-deployment screenshot/DOM check of affected routes) — "build
+> green" and "eslint clean" both passed while the site rendered an empty root. A fix that lets
+> execution reach the next line can expose the next latent crash — re-render the route, don't
+> just re-read the diff.
+
 RECEIPT (final message, nothing else):
 VERDICT: SHIP | NO-SHIP | SHIP-WITH-NOTES
 DIMENSIONS: correctness=… evidence=… doc-truth=… leakage=…

@@ -79,3 +79,31 @@ stale-content note stands until then. Then re-run `/catalog-sync` on main if any
   (reachability = origin/main ∪ branch ∪ open-PR heads) **and** re-diff the squashed commit against
   intent — the art rewrite silently absorbed 20MB of untracked client media.
 - Tags of record move with remediation: retag at the reviewed tip, never leave a mid-remediation tag.
+
+## Post-merge validation (2026-08-04, after all six PRs merged)
+
+All six automation PRs merged as **true merge commits** (every branch tip an ancestor of main;
+both baseline tags reachable). Plan-v3 phase-gate audit: PASS on every deliverable except the
+gaps below. Live tests ran on every surface. Findings register:
+
+| # | Finding | Disposition |
+|---|---|---|
+| F1 | `[skip release]` guard failed a 2nd time at merge → benign `qari-assets-9` cut (settings-only delta; nothing pins it) | Fixed forward: [qari-assets #10](https://github.com/nmalick/qari-assets/pull/10) (paths filter) — MERGED. Deleting the -9 release/tag = owner decision |
+| F2+F5 | Qari `distribute.yml` red on main — 3 DB-copy sites lacked `create(recursive:true)`; cold runners threw PathNotFoundException (7+1 test failures) | Fixed: [Qari #73](https://github.com/nmalick/Qari/pull/73) — MERGED. Gates: analyze 417 baseline · warm 53/53 · cold parallel + cold `-j1` PASS |
+| F3 | bil-app main had ZERO workflows (plan's ci-baseline never landed) | Fixed: [bil #2](https://github.com/nmalick/bil-app/pull/2) — all 4 jobs green (tsc ×2, mobile ≤17 ratchet, landing build-then-tsc, docs-freshness incl. 2 real stale-frontmatter fixes) |
+| F4 | art has no build/typecheck CI (client-repo caution skipped it) | Report-only recommendation |
+| F6 | docs-freshness job absent in Qari / qari-assets / art (plan said all repos) | Report-only recommendation; canonical script extended here (ranges + `git-history` sentinel) |
+| F7 | `catalog_sync --check` drift on main post-merges (pointer indexes embed per-repo cursors; six mains moved; CI blind to gitignored repos) | Regenerated in this branch |
+| **F8 P0** | **emnlabs.io blank on every route since the baseline merge deploy** — T1 lint pass removed the `icon: Icon` destructure alias that `<Icon/>` uses (eslint false-positive: no `react/jsx-uses-vars`, no args ignore-pattern; vite build can't catch undefined identifiers; no error boundary → tree unmount) | Fixed: [emnlabs #4](https://github.com/nmalick/emnlabs_site/pull/4) (restore + eslint `argsIgnorePattern`) — **merge first**; Vercel auto-deploys |
+| F9 | `/field-notes/:id` STILL blanked after the rebuild's T2 fix — next line's unguarded `project.timeline.started` throws on Firestore initiatives without `timeline` (pre-existing; the T2 fix let execution reach it) | Fixed in the same [emnlabs #4](https://github.com/nmalick/emnlabs_site/pull/4) (guard). Backlog rec: route-level error boundary |
+| F10 | Friday `/api/chat` → 500: **Anthropic API "credit balance too low"** (function + key verified working end-to-end; graceful widget error; no tokens consumed) | Owner console step: top up billing + set the still-open workspace **spend cap** in the same visit |
+| F11 | bil registry row has empty `live_url` while `bil.emnlabs.io` serves the landing page | Owner decision: add it to `registry/bil-app.md` (public-surface content choice) |
+
+Live-test evidence: emnlabs preview (both fixes) renders home + article route; Friday
+infrastructure verified to the Anthropic 400; bil landing live; bil backend route smoke proves
+T2-4 (`/teams/statistics` answers from the statistics handler); art live site READ-ONLY browse
+confirms **live catalog** (Firebase Storage product images, 13 originals) — the split-brain
+demo-catalog state is NOT active; Pages 200 serving the generated catalog. Qari simulator run
+pending a local `xcode-select` fix (user command). Fleet lessons encoded: code-fixer +
+reviewer Past-learning blocks (lint-removal usage grep; build ≠ render; render evidence
+required for component changes).

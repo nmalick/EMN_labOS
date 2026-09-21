@@ -80,7 +80,12 @@ def main():
                     except ValueError:
                         findings.append(f"BAD_FRONTMATTER {p} (unparsable last_verified/ttl_days)")
                 for src in [s.strip() for s in meta.get("sources", "").split(",") if s.strip()]:
-                    m = re.match(r"^(.*?):(\d+)$", src)
+                    # Sentinel sources (history docs derive from git, not files) are exempt,
+                    # mirroring the verified_against n/a rule.
+                    if src.lower().startswith(("git-history", "n/a")):
+                        continue
+                    # Accept path:line and path:line-line ranges.
+                    m = re.match(r"^(.*?):(\d+)(?:-(\d+))?$", src)
                     fpath = m.group(1) if m else src
                     target = os.path.join(repo, fpath)
                     if not os.path.exists(target):

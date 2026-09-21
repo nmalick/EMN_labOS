@@ -4,4 +4,17 @@
 
 _Generated pointer into the project's own `project-os/`; content lives in the project repo._
 
-_No project-os doc kit yet (pre-baseline)._
+> Repo**: nmalick/Qari · **Last commit checked**: `00b7558` (2026-08-02) · **Last updated**: 2026-08-03
+
+| Doc | Contains | Reference when |
+| engineering/architecture.md | Code-verified architecture (289 claims): real state layer (9 singleton ChangeNotifiers — the Riverpod claim is a documented myth), module map, AI mode, data layer, asset-pin contract, CI gotchas | Any stack/structure question — BEFORE reading code |
+| product/features.md | Feature inventory, applicability-matrix style — SHIPPED/PARTIAL/PIVOTED/PLANNED-NOT-BUILT rows with evidence | What exists vs what was promised |
+| product/status.md | Current one-page status (supersedes the frozen 2025 snapshot) | Quick state check |
+| history/2025-2026.md | Event log · backfilled decision log · branch-archaeology experiments · Dropped/Unfinished rows with recover pointers | Why is it this way; what was tried |
+| history/CHANGELOG.md | Version-timeline backfill (no tags existed — reconstructed, Inferred-tagged) | What shipped when |
+| history/migration-boundary.md | The doc-migration archaeology boundary (6a29bca) | git-log archaeology across the move |
+| plans/improvement-backlog.md | T1/T2/T3 improvements + dependency debt (227 claims) | Before changing any code |
+| plans/legacy/ | Migrated pre-rebuild plan docs | Historical context only |
+| ops/verify.md · deploy.md · ref-map.md · backup.md · secrets.md | VERIFY_CMD · release runbook · /update-ref triage map · backup posture (keystore SPOF!) · secrets by name | Build/release/maintenance work |
+| knowledge-base/qul-reference/ | 109-file upstream research corpus (INDEX.md is the map; public-safety rule in knowledge-base/README.md) | Deep QUL/tajweed resource questions |
+| research/ · engineering/features/ · engineering/adr/ | Migrated research + legacy feature docs + ADRs (0001 carries a stale-Proposed status — see history decision log) | Tracing legacy design intent |
