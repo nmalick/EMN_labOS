@@ -12,4 +12,5 @@ stack: Flutter, Dart, sqflite, HuggingFace
 summary: Tajweed learning app for Quran recitation — guided lessons, practice, AI-assisted reading.
 ---
 
-Mobile app (Flutter). Omitted from the public catalog until it has a live URL (default-deny).
+Mobile app (Flutter). Listed in the public catalog via `showcase: true` (no live URL yet); the repo
+stays private (`repo_public: false`), so no repo link is emitted.

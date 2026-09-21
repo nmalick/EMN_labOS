@@ -37,6 +37,8 @@ the actual project folders live here on disk but are **never tracked** (deny-all
 | A hook blocks a commit | Fix the cause (or extend `.labos-allow` deliberately) — **never `--no-verify`** |
 
 ## Catalog is generated, never hand-edited
-`registry/*.md` is the source of truth → `/catalog-sync` emits `projects.json` + STATUS/ROADMAP/
-RELEASE-NOTES + `docs/index.html`. Default-deny: only `visibility ∈ {public,anonymized}` with a
-non-empty `live_url` ever reaches a public surface.
+`registry/*.md` is the source of truth → `/catalog-sync` emits `projects.json` + README/STATUS/
+ROADMAP/RELEASE-NOTES + `docs/` + `registry/<slug>-index.md`. Default-deny: only
+`visibility ∈ {public,anonymized}` AND (`live_url` OR `repo_public` OR `showcase`) ever reaches a
+public surface (`is_public()` in `scripts/lib/registry.py`) — clearing `live_url` alone does not
+unpublish. Removing a project = delete its entry and regenerate (the orphaned index is deleted).
