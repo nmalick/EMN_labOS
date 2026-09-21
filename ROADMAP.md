@@ -2,7 +2,7 @@
 
 # Roadmap
 
-_As of the latest registry change: 2026-08-02_
+_As of the latest registry change: 2026-09-21_
 
 Public projects grouped by status. Private/unlisted projects are omitted by design.
 
