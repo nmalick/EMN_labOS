@@ -39,13 +39,16 @@ prints an `OMITTED (why)` line per exclusion so deny decisions are auditable.
 |---|---|---|
 | `name, slug, bucket, status, stack, live_url, summary, highlights, showcase` | yes | via the `public_record` allowlist — the only path to output |
 | `repo_url` | only when `repo_public: true` | |
-| `mcps` | yes, **except `bucket: freelance`** (client tooling stays private) and only while `mcps_verified` is fresh | AI-ops page + corpus |
+| `mcps` | yes, **except `bucket: freelance`** (client tooling stays private) | AI-ops page + corpus. `mcps_verified` is **not** read by the generator: freshness is a `/labos-maintenance` re-probe duty, not a publication gate (a date-based gate would make `--check` depend on today) |
 | `docs_status`, `docs_verified` | **no** | internal maintenance signal only |
 
 ## Generated neighbors in this directory
 
 `<slug>-index.md` files are **generated pointer indexes** (from each project's own
-`project-os/DIRECTORY.md`) — never hand-edit. `ai-ops-prose.md` is the one hand-authored
+`project-os/DIRECTORY.md`) — never hand-edit. The project folders are gitignored, so where one
+is not on disk (CI, a worktree, an un-cloned bucket) its committed index body is carried forward
+rather than regenerated; refresh pointers from the main checkout. An index with no eligible
+entry behind it is deleted by `catalog_sync` and fails `--check`. `ai-ops-prose.md` is the one hand-authored
 file here: the prose for `docs/ai-ops.html` (kept identifier-free; never generated from
 hook/config source).
 

@@ -12,4 +12,5 @@ stack: Fonts, Python
 summary: Quranic fonts and Tajweed typesetting assets consumed by the Qari app.
 ---
 
-Supporting asset repository. Omitted from the public catalog (no live URL).
+Supporting asset repository. Listed in the public catalog as a public repo (`repo_public: true`,
+also `showcase: true`); no live URL.

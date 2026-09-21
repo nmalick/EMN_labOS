@@ -12,4 +12,5 @@ stack: React Native, Expo, Node.js, TypeScript
 summary: Proof-of-concept app (mobile client + backend).
 ---
 
-POC. Omitted from the public catalog until it has a live URL (default-deny).
+POC. Listed in the public catalog via `showcase: true` (no `live_url` set); the repo stays private
+(`repo_public: false`), so no repo link is emitted.

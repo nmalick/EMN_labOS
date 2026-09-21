@@ -6,13 +6,17 @@ The linchpin invariant: a registry entry reaches a public surface ONLY when
 Every combination of the four gate dimensions is exercised; private entries must
 appear in NO generated artifact, including the corpus (a second private→public route).
 Also: allowlist proof (a junk field never propagates), freelance-mcps gate, and
-shell-safety of repo_url.
+shell-safety of repo_url. And the 2026-09 gate-soundness fixes: kit-derived content is
+carried forward (never faked as "pre-baseline") when the project folder is absent, orphaned
+index files are drift and get deleted, and the "as of" stamp does not depend on git history.
 
 Run: python3 -m pytest tests/  (or python3 tests/test_default_deny.py)
 """
 import itertools
+import json
 import os
 import sys
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, "..", "scripts", "lib"))
@@ -40,16 +44,14 @@ def test_eligibility_matrix():
 
 
 def test_private_reaches_no_artifact():
-    hidden = entry("private", True, True, True, name="HiddenProj", slug="hidden")
+    # Distinctive tokens: a common word as the slug would make a substring check meaningless.
+    hidden = entry("private", True, True, True, name="HiddenProjZq", slug="hidden-slug-zq")
     shown = entry("public", True, False, False, name="ShownProj", slug="shown")
     arts = C.render_all([m for m in [hidden, shown] if R.is_public(m)], "2026-01-01")
     for path, content in arts.items():
-        assert "HiddenProj" not in content, f"private name leaked into {path}"
-        assert "hidden" not in content or "hidden" == "hidden" and "slug" not in path or True
-    # slug check, strict:
-    for path, content in arts.items():
-        assert "HiddenProj" not in content
-    assert "registry/hidden-index.md" not in arts and os.path.join("registry", "hidden-index.md") not in arts
+        assert "HiddenProjZq" not in content, f"private name leaked into {path}"
+        assert "hidden-slug-zq" not in content, f"private slug leaked into {path}"
+        assert "hidden-slug-zq" not in path, f"private slug names an artifact: {path}"
 
 
 def test_allowlist_junk_field_never_emits():
@@ -92,6 +94,77 @@ def test_live_registry_is_valid():
     assert not load_errors, f"live registry load errors: {load_errors}"
     errs = R.validate(entries)
     assert not errs, f"live registry invalid: {errs}"
+
+
+def test_kit_unknown_is_carried_forward_not_faked():
+    # Project folder absent (CI; gitignored bucket): committed kit content survives, and a
+    # hand-added corpus key or a non-eligible slug's body never rides along.
+    m = entry("public", True, False, False, name="Carried", slug="carried-zq")
+    prior = {"asof": None,
+             "index_body": {"carried-zq": "> cursor-zq\n\n| a | b | c |\n", "ghost-zq": "GHOST-BODY\n"},
+             "doc_index": {"carried-zq": {"has_kit": True, "cursor": "cursor-zq", "junk": "MUST-NEVER-EMIT"}}}
+    arts = C.render_all([m], "2026-01-01", prior)
+    assert arts[C.index_path("carried-zq")].endswith(C.INDEX_INTRO + "\n\n> cursor-zq\n\n| a | b | c |\n")
+    assert json.loads(arts[C.CORPUS])[0]["doc_index"] == {"has_kit": True, "cursor": "cursor-zq"}
+    for path, content in arts.items():
+        assert "GHOST-BODY" not in content and "MUST-NEVER-EMIT" not in content, path
+    # Nothing ever committed for it -> the placeholder.
+    assert C.NO_KIT in C.render_all([m], "2026-01-01")[C.index_path("carried-zq")]
+
+
+def test_kit_on_disk_wins_over_committed():
+    m = entry("public", True, False, False)
+    prior = {"asof": None, "index_body": {"p": "STALE-BODY\n"},
+             "doc_index": {"p": {"has_kit": True, "cursor": "stale"}}}
+    orig = R.project_dir
+    with tempfile.TemporaryDirectory() as d:
+        R.project_dir = lambda _m: d
+        try:
+            # Folder present, no project-os: authoritatively "no kit" — the committed body goes.
+            arts = C.render_all([m], "2026-01-01", prior)
+            assert C.NO_KIT in arts[C.index_path("p")] and "STALE-BODY" not in arts[C.index_path("p")]
+            assert json.loads(arts[C.CORPUS])[0]["doc_index"] == {"has_kit": False, "cursor": ""}
+            os.makedirs(os.path.join(d, "project-os", "engineering"))
+            with open(os.path.join(d, "project-os", "DIRECTORY.md"), "w") as f:
+                f.write("| Doc | Contains | When |\n|---|---|---|\n| a.md | fresh-row | x |\n")
+            with open(os.path.join(d, "project-os", "engineering", "architecture.md"), "w") as f:
+                f.write("> **Last commit checked**: `abc1234`\n")
+            idx = C.render_all([m], "2026-01-01", prior)[C.index_path("p")]
+            assert "fresh-row" in idx and "abc1234" in idx and "STALE-BODY" not in idx
+        finally:
+            R.project_dir = orig
+
+
+def test_orphan_index_is_drift_and_deleted():
+    m = entry("public", True, False, False, slug="keep")
+    with tempfile.TemporaryDirectory() as root:
+        os.makedirs(os.path.join(root, "registry"))
+        ghost = os.path.join(root, "registry", "gone-index.md")
+        with open(ghost, "w") as f:
+            f.write("# Gone — doc index (pointer)\n")
+        arts = C.plan([m], C.load_prior(root), root, "2026-01-01")
+        orphans = C.stale_indexes(arts, root)
+        assert orphans == [C.index_path("gone")], orphans
+        C.apply(arts, C.drifted(arts, root), orphans, root)
+        assert not os.path.exists(ghost)
+        assert os.path.isfile(os.path.join(root, C.index_path("keep")))
+        assert not C.drifted(arts, root) and not C.stale_indexes(arts, root)
+
+
+def test_asof_stamp_is_stable_and_git_free():
+    # A later regen (or a squash-merge re-dating the commit) must not move the stamp;
+    # only a change to a stamped surface does, and then to the generation date.
+    m = entry("public", True, False, False)
+    with tempfile.TemporaryDirectory() as root:
+        arts = C.plan([m], C.load_prior(root), root, "2026-01-01")
+        C.apply(arts, C.drifted(arts, root), [], root)
+        arts = C.plan([m], C.load_prior(root), root, "2026-02-02")
+        assert not C.drifted(arts, root), "unchanged content must keep its stamp"
+        assert "2026-01-01" in arts["STATUS.md"]
+        changed = dict(m, summary="a new summary")
+        arts = C.plan([changed], C.load_prior(root), root, "2026-03-03")
+        for p in C.STAMPED:
+            assert "2026-03-03" in arts[p] and "2026-01-01" not in arts[p], p
 
 
 if __name__ == "__main__":
