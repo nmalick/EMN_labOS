@@ -2,8 +2,7 @@
 
 # Release notes
 
-_As of the latest registry change: 2026-08-02_
+_As of the latest registry change: 2026-09-21_
 
 - **Art is Everywear** — live at [https://aubreyorlando.art](https://aubreyorlando.art).
 - **EMN Labs** — live at [https://emnlabs.io](https://emnlabs.io).
-- **Opportunity Tool** — live at [https://opportunitytool.vercel.app](https://opportunitytool.vercel.app).

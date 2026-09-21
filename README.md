@@ -4,7 +4,7 @@
 
 **The lab operating system**: a public umbrella for Malick Ndiaye's private projects — part machine OS (identity separation, replication, config hygiene), part showcase (project inventory + the AI-operations architecture itself). Projects live as private repos; this repo publishes only registry-gated metadata and the OS tooling.
 
-_Catalog as of the latest registry change: 2026-08-02_
+_Catalog as of the latest registry change: 2026-09-21_
 
 ## Projects
 
@@ -14,7 +14,6 @@ _Catalog as of the latest registry change: 2026-08-02_
 | Art is Everywear | Storefront for original artwork and small-batch apparel — made-to-order requests with a Firebase-backed catalog and admin. | Next.js, TypeScript, Tailwind, Firebase, Vercel | [live](https://aubreyorlando.art) |
 | bil-app | Proof-of-concept app (mobile client + backend). | React Native, Expo, Node.js, TypeScript | in development |
 | EMN Labs | Personal portfolio and EMN Labs showcase site. | React, Vite, Firebase, Vercel | [live](https://emnlabs.io) |
-| Opportunity Tool | Opportunity-tracking web tool — split out of the portfolio site into its own deployment. | JavaScript, Vercel | [live](https://opportunitytool.vercel.app) |
 | qari-assets | Quranic fonts and Tajweed typesetting assets consumed by the Qari app. | Fonts, Python | [repo](https://github.com/nmalick/qari-assets) |
 
 ## The OS itself

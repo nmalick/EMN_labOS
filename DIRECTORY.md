@@ -47,6 +47,5 @@ On-demand map of the umbrella. Load this when you need to know where something l
 | `freelance-projects/` | art_is_everywear |
 | `pocs/` | bil-app |
 
-Not on disk: `opportunity_tool` (registry-listed, deployed; baseline deferred).
 Each project's documentation lives in its own repo under `project-os/` — the generated
 `registry/<slug>-index.md` pointer indexes route into them from here.
