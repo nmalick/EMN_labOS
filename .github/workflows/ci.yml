@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # registry_date derives from git log
+          fetch-depth: 0   # check-freshness tests verified_against ancestry (catalog_sync reads no git)
       - name: Default-deny regression tests
         run: python3 tests/test_default_deny.py
       - name: Catalog drift gate (generated surfaces match registry)
