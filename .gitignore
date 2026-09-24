@@ -5,13 +5,9 @@
 !/.gitignore
 !/README.md
 !/CLAUDE.md
+!/WORKING-RULES.md
+!/VOICE.md
 !/DIRECTORY.md
-!/STATUS.md
-!/ROADMAP.md
-!/RELEASE-NOTES.md
-!/now.md
-!/projects.json
-!/.mcp.json
 !/.claude/
 !/.claude/.gitkeep
 !/.claude/settings.json

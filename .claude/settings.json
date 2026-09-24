@@ -34,7 +34,7 @@
       "Read(**/*.jks)",
       "Write(**/*.jks)",
       "Edit(**/*.jks)",
-      "Read(/Users/malick/YaqeenProjects/**)",
+      "Read(/Users/malick/*Projects/**)",
       "Bash(gh pr merge:*)",
       "Bash(gh pr close:*)",
       "Bash(gh repo delete:*)",

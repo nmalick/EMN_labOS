@@ -16,7 +16,7 @@ verification from a work session, so this rebuild documented the work instead of
 **The detailed plan lives OUTSIDE this repo** (it names work systems; this repo is public):
 
 ```
-~/YaqeenProjects/JourneyOS/.claude-work/plans/global-work-eviction.md
+<work-projects-dir>/<work-repo>/.claude-work/plans/global-work-eviction.md
 ```
 
 Trigger: next work session with infra time. Debt-register row: rebuild tracker `D-3`.
