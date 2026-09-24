@@ -45,7 +45,7 @@ On-demand map of the umbrella. Load this when you need to know where something l
 |---|---|
 | `personal-projects/` | Qari, qari-assets, emnlabs_site |
 | `freelance-projects/` | art_is_everywear |
-| `pocs/` | bil-app |
+| `pocs/` | bil-app, safar |
 
 Each project's documentation lives in its own repo under `project-os/` — the generated
 `registry/<slug>-index.md` pointer indexes route into them from here.
