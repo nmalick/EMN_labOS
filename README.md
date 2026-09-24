@@ -4,17 +4,17 @@
 
 **The lab operating system**: a public umbrella for Malick Ndiaye's private projects — part machine OS (identity separation, replication, config hygiene), part showcase (project inventory + the AI-operations architecture itself). Projects live as private repos; this repo publishes only registry-gated metadata and the OS tooling.
 
-_Catalog as of the latest registry change: 2026-09-21_
+_Catalog as of the latest registry change: 2026-09-24_
 
 ## Projects
 
-| Project | Summary | Stack | Links |
-|---|---|---|---|
-| Qari | Tajweed learning app for Quran recitation — guided lessons, practice, AI-assisted reading. | Flutter, Dart, sqflite, HuggingFace | in development |
-| Art is Everywear | Storefront for original artwork and small-batch apparel — made-to-order requests with a Firebase-backed catalog and admin. | Next.js, TypeScript, Tailwind, Firebase, Vercel | [live](https://aubreyorlando.art) |
-| bil-app | Proof-of-concept app (mobile client + backend). | React Native, Expo, Node.js, TypeScript | in development |
-| EMN Labs | Personal portfolio and EMN Labs showcase site. | React, Vite, Firebase, Vercel | [live](https://emnlabs.io) |
-| qari-assets | Quranic fonts and Tajweed typesetting assets consumed by the Qari app. | Fonts, Python | [repo](https://github.com/nmalick/qari-assets) |
+| Project | Bucket | Status | Summary | Stack | Links |
+|---|---|---|---|---|---|
+| Qari | personal | active | Tajweed learning app for Quran recitation — guided lessons, practice, AI-assisted reading. | Flutter, Dart, sqflite, HuggingFace | in development |
+| Art is Everywear | freelance | live | Storefront for original artwork and small-batch apparel — made-to-order requests with a Firebase-backed catalog and admin. | Next.js, TypeScript, Tailwind, Firebase, Vercel | [live](https://aubreyorlando.art) |
+| bil-app | poc | poc | Proof-of-concept app (mobile client + backend). | React Native, Expo, Node.js, TypeScript | in development |
+| EMN Labs | personal | live | Personal portfolio and EMN Labs showcase site. | React, Vite, Firebase, Vercel | [live](https://emnlabs.io) |
+| qari-assets | personal | support | Quranic fonts and Tajweed typesetting assets consumed by the Qari app. | Fonts, Python | [repo](https://github.com/nmalick/qari-assets) |
 
 ## The OS itself
-The showcase artifact is this repo's structure: registry-driven generated catalog (default-deny), identity-wall git hooks, machine replication (`scripts/bootstrap.sh`), an allowlist-synthesized public config snapshot (`home-claude/`), and the AI-ops surface ([docs/ai-ops.html](docs/ai-ops.html)). Start at [DIRECTORY.md](DIRECTORY.md).
+The showcase artifact is this repo's structure: registry-driven generated catalog (default-deny), identity-wall git hooks, machine replication (`scripts/bootstrap.sh`), an allowlist-synthesized public config snapshot (`home-claude/`), and the AI-ops surface ([docs/ai-ops.html](docs/ai-ops.html)). Start at [CLAUDE.md](CLAUDE.md).

@@ -3,8 +3,8 @@
 > **Purpose:** Regenerate the public project catalog from `registry/*.md`.
 
 ---
-description: Regenerate every public surface (projects.json, README/STATUS/ROADMAP/RELEASE-NOTES,
-  docs/, registry/<slug>-index.md) from registry/*.md. Default-deny — shown only when
+description: Regenerate every public surface (README catalog table, docs/, and the
+  registry/<slug>-index.md pointers) from registry/*.md. Default-deny — shown only when
   public/anonymized AND (live_url OR repo_public OR showcase).
 ---
 
@@ -55,7 +55,7 @@ Never edit the generated files directly.
 > is carried forward. (3) The "as of" stamp was the newest git commit touching `registry/`. The
 > documented regenerate-then-commit order stamped the previous commit's date, and a squash-merge
 > re-dates the commit anyway, so no procedure could keep it stable. The stamp is now carried from
-> the committed `STATUS.md` and only moves when stamped content changes. Do **not** reintroduce a
+> the committed `README.md` and only moves when stamped content changes. Do **not** reintroduce a
 > "restamp after the registry commit" step. (4) The generator had no cleanup pass and `--check`
 > never looked for extra files, so a removed project's `<slug>-index.md` stayed tracked on a
 > public repo. Orphans are now deleted and are drift. (5) `registry/README.md` claimed `mcps`

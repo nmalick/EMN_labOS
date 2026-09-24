@@ -12,7 +12,7 @@ Captured 2026-08-02 at Phase 0/1 boundary. The Phase 5 after-measurement diffs a
 | Global `agent-memory/` | 2 orphaned namespaces, 9 files, dead project (Tandem) | research-global-config |
 | `~/.claude/plans/` | 16 files (~12 work, in the unscoped global dir) | verify pass |
 | Skill-roster pollution in a personal session | ~163 entries, **130 (~80%) are the work PostHog plugin**; 109 already description-truncated (budget saturated) | stress-redteam-wall |
-| Work commands injected when JourneyOS is an additional dir | 26 commands ≈ 1.7K tokens | stress-redteam-wall (observed live) |
+| Work commands injected when the work repo is an additional dir | 26 commands ≈ 1.7K tokens | stress-redteam-wall (observed live) |
 | `CLAUDE_CODE_SUBAGENT_MODEL` | UNSET (verified — frontmatter tiering active) | Phase 0.5 |
 
 ## Routing probe (before) — tokens/files to answer 5 standing questions per project

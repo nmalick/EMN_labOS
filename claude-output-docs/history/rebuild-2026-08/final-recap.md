@@ -63,7 +63,7 @@ stale-content note stands until then. Then re-run `/catalog-sync` on main if any
 
 | # | Item |
 |---|---|
-| D-3 | **Global work eviction** — execute from a work session; detail at JourneyOS `.claude-work/plans/global-work-eviction.md`; umbrella stub in `claude-output-docs/plans/work-eviction-handoff.md` |
+| D-3 | **Global work eviction** — execute from a work session; detail in the work repo's `.claude-work/plans/global-work-eviction.md`; umbrella stub in `claude-output-docs/plans/work-eviction-handoff.md` |
 | ENV-1 | `code-fixer` `isolation: worktree` defect on nested gitignored repos — orchestrator ran fix loops directly this run; fix before the next fleet fix-pass |
 | — | qari-assets `auto-release.yml` lacks `paths:` filter (T2) — every merge risks an empty release without the typed marker |
 | — | emnlabs T2-01 (chat contract test), T2-03 (CORS lock, blocked on D-15) staged not applied |
