@@ -9,7 +9,7 @@
 !/VOICE.md
 !/DIRECTORY.md
 !/.claude/
-!/.claude/.gitkeep
+!/.claude/CLAUDE.md
 !/.claude/settings.json
 !/.claude/agents/
 !/.claude/agents/**
