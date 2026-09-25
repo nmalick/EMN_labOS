@@ -4,12 +4,13 @@
 
 **The lab operating system**: a public umbrella for Malick Ndiaye's private projects — part machine OS (identity separation, replication, config hygiene), part showcase (project inventory + the AI-operations architecture itself). Projects live as private repos; this repo publishes only registry-gated metadata and the OS tooling.
 
-_Catalog as of the latest registry change: 2026-09-24_
+_Catalog as of the latest registry change: 2026-09-25_
 
 ## Projects
 
 | Project | Bucket | Status | Summary | Stack | Links |
 |---|---|---|---|---|---|
+| EMN_labOS | personal | active | The umbrella OS itself — registry-driven public catalog, identity-wall git hooks, and one-command machine replication. | Python, Bash, GitHub Actions | [live](https://nmalick.github.io/EMN_labOS/), [repo](https://github.com/nmalick/EMN_labOS) |
 | Qari | personal | active | Tajweed learning app for Quran recitation — guided lessons, practice, AI-assisted reading. | Flutter, Dart, sqflite, HuggingFace | in development |
 | Art is Everywear | freelance | live | Storefront for original artwork and small-batch apparel — made-to-order requests with a Firebase-backed catalog and admin. | Next.js, TypeScript, Tailwind, Firebase, Vercel | [live](https://aubreyorlando.art) |
 | bil-app | poc | poc | Proof-of-concept app (mobile client + backend). | React Native, Expo, Node.js, TypeScript | in development |

@@ -3,24 +3,22 @@ source — that would republish machine internals. Keep it descriptive and ident
 
 # AI-ops architecture notes (hand-authored)
 
-This repository is itself the exhibit: a solo-operator "lab OS" where AI tooling runs the
-operating layer. A registry of flat-frontmatter project entries drives every public surface
-through a single allowlist gate (default-deny — an entry reaches the catalog only when it is
-explicitly public AND deliberately listed), so private work cannot leak by prose.
+This repo is the exhibit: a one-person "lab OS" where AI tooling runs the operating layer. One
+registry file per project drives every public page through a single allowlist gate. The default
+is deny — a project appears only when it is marked public and deliberately listed — so private
+work cannot leak through prose someone forgot to update.
 
-Two git identities share one machine, separated by layered enforcement: conditional git
-identity by path, plus profile-aware commit and push hooks that verify the author, the active
-GitHub account, and scan staged blobs for secret-shaped content. The hook logic is public in
-this repo; the identifiers it checks live in a machine-local file the hooks refuse to ever
-commit.
+Two git identities share one machine, kept apart by layers that each fail closed. Git picks the
+author by directory. Commit and push hooks check that author, the active GitHub account, and the
+staged content for anything secret-shaped. The hook logic is public here; the identifiers it
+matches sit in a machine-local file the hooks refuse to commit.
 
-Documentation is treated as a build artifact with provenance: each project repo carries a
-`project-os/` folder whose docs cite `file:line` sources, carry verification timestamps and
-TTLs, and are checked by a blind verifier agent that re-derives citations from source without
-seeing the author's reasoning. Audits, fixes, and reviews run as a tiered agent fleet —
-mechanical checks on small fast models, irreversible judgment on the largest — orchestrated
-by a session that validates receipts rather than re-doing work.
+Documentation is a build artifact with provenance. Each project repo carries a project-os folder
+whose docs cite file and line, carry a verification date and a TTL, and are checked by a separate
+agent that re-derives every citation from the source without seeing the author's reasoning.
+Audits, fixes and reviews run as a tiered fleet: mechanical checks on small models, and judgment
+that is expensive to get wrong on the largest.
 
-Machine replication is one command: a bootstrap script that clones the umbrella and every
-registered project, restores an allowlist-synthesized config snapshot, and asserts the
-identity wall is actually standing before it reports success.
+Replication is one command. A bootstrap script clones the umbrella and every registered project,
+restores a curated config snapshot, and refuses to report success unless the identity wall is
+actually standing.

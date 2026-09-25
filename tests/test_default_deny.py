@@ -23,6 +23,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "scripts", "lib"))
 sys.path.insert(0, os.path.join(HERE, "..", "scripts"))
 import registry as R  # noqa: E402
 import catalog_sync as C  # noqa: E402
+import gen_manifest as M  # noqa: E402
 
 
 def entry(visibility, live, repo_pub, showcase, name="P", slug="p", bucket="personal"):
@@ -165,6 +166,57 @@ def test_asof_stamp_is_stable_and_git_free():
         arts = C.plan([changed], C.load_prior(root), root, "2026-03-03")
         for p in C.STAMPED:
             assert "2026-03-03" in arts[p] and "2026-01-01" not in arts[p], p
+
+
+def test_local_registry_entry_cannot_publish():
+    # registry.local/ is gitignored: CI never sees it, so a publication-eligible entry there
+    # would make --check pass locally and fail in CI. validate() must reject it loudly.
+    m = entry("public", True, False, False, name="LocalPub", slug="local-pub")
+    m["_local"] = True
+    errs = R.validate([m])
+    assert any("registry.local" in e for e in errs), errs
+    # A private local entry is fine, and stays out of every artifact.
+    priv = entry("private", False, False, False, name="LocalPriv", slug="local-priv")
+    priv["_local"] = True
+    assert not R.validate([priv])
+    assert not R.is_public(priv)
+    arts = C.render_all([m for m in [priv] if R.is_public(m)], "2026-01-01")
+    for path, content in arts.items():
+        assert "LocalPriv" not in content and "local-priv" not in content, path
+
+
+def test_loader_skips_non_entry_files():
+    import tempfile, os as _os
+    with tempfile.TemporaryDirectory() as d:
+        reg, loc = _os.path.join(d, "registry"), _os.path.join(d, "registry.local")
+        _os.makedirs(reg); _os.makedirs(loc)
+        for name in ("README.md", "ai-ops-prose.md", "x-index.md"):
+            open(_os.path.join(reg, name), "w").write("no frontmatter here\n")
+        open(_os.path.join(reg, "real.md"), "w").write(
+            "---\nname: Real\nslug: real\nbucket: personal\nvisibility: public\n"
+            "status: active\nsummary: s\nshowcase: true\n---\n")
+        open(_os.path.join(loc, "hidden.md"), "w").write(
+            "---\nname: Hidden\nslug: hidden-zq\nbucket: poc\nvisibility: private\n"
+            "status: poc\nsummary: s\n---\n")
+        orig_reg, orig_loc = R.REG, R.REG_LOCAL
+        R.REG, R.REG_LOCAL = reg, loc
+        try:
+            entries, errors = R.load()
+        finally:
+            R.REG, R.REG_LOCAL = orig_reg, orig_loc
+    assert not errors, errors
+    assert sorted(m["slug"] for m in entries) == ["hidden-zq", "real"]
+    assert {m["slug"]: m["_local"] for m in entries} == {"real": False, "hidden-zq": True}
+
+
+def test_manifest_never_clones_the_umbrella_into_itself():
+    # The umbrella catalogues itself, so gen_manifest must recognise its own remote in any form
+    # and skip it — otherwise bootstrap clones this repo into personal-projects/.
+    own = "https://github.com/nmalick/EMN_labOS.git"
+    for variant in (own, "https://github.com/nmalick/EMN_labOS",
+                    "git@github.com:nmalick/EMN_labOS.git", "HTTPS://GitHub.com/nmalick/EMN_labOS/"):
+        assert M.norm_repo(variant) == M.norm_repo(own), variant
+    assert M.norm_repo("https://github.com/nmalick/Qari.git") != M.norm_repo(own)
 
 
 if __name__ == "__main__":

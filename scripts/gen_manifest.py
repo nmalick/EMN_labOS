@@ -11,10 +11,30 @@ sources. gen_manifest maintains manifest.local.sh on this machine as a convenien
 (it is never committed — enforced by .gitignore).
 """
 import os
+import subprocess
 import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib"))
 import registry as R  # noqa: E402
+
+
+def norm_repo(url):
+    """Comparable form of a repo URL: no scheme, no .git, no trailing slash, lowercased."""
+    u = (url or "").strip().lower()
+    for prefix in ("https://", "http://", "ssh://", "git@"):
+        if u.startswith(prefix):
+            u = u[len(prefix):]
+    return u.replace(":", "/").rstrip("/").removesuffix(".git")
+
+
+def own_remote(root=None):
+    """This repo's own origin URL, or '' when git is unavailable."""
+    try:
+        out = subprocess.run(["git", "-C", root or R.ROOT, "config", "--get", "remote.origin.url"],
+                             capture_output=True, text=True, check=True)
+        return out.stdout.strip()
+    except Exception:
+        return ""
 
 
 def main():
@@ -27,9 +47,14 @@ def main():
         sys.exit(2)
 
     pub_rows, loc_rows, skipped = [], [], []
+    # The umbrella catalogues itself, but it must never be cloned into one of its own buckets.
+    self_url = norm_repo(own_remote())
     for m in entries:
         url = (m.get("repo_url") or "").strip()
         bucket_dir = R.BUCKET_DIR.get(m.get("bucket", ""), "")
+        if self_url and norm_repo(url) == self_url:
+            skipped.append((m.get("slug", "?"), "this repo — the umbrella is never cloned into a bucket"))
+            continue
         if not url or not bucket_dir:
             skipped.append((m.get("slug", m.get("name", "?")),
                             "no repo_url" if not url else f"bad bucket '{m.get('bucket','')}'"))
