@@ -100,5 +100,52 @@ PY
 )"
 fi
 if [ -n "$shown" ]; then printf '%s\n' "$shown"; else warn "select the 'Personal' connector group in the Claude app account switcher"; fi
+# 5) work-folder read guard (machine-local) --------------------------------
+# The umbrella's tracked settings.json denies reads of ~/*Projects/**; the exact work path is
+# machine-local (hooks/identities.local) and is written into the gitignored
+# .claude/settings.local.json, so the public repo never names it.
+echo "Work-folder read guard:"
+UMBRELLA="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+IDF="$UMBRELLA/hooks/identities.local"
+LOCAL_SETTINGS="$UMBRELLA/.claude/settings.local.json"
+if [ ! -f "$IDF" ]; then
+  warn "hooks/identities.local missing — cannot add the work-folder deny rule"
+elif ! command -v python3 >/dev/null 2>&1; then
+  warn "python3 missing — cannot update .claude/settings.local.json"
+else
+  # shellcheck source=/dev/null
+  . "$IDF"
+  if [ -z "${WORK_DIR_GLOB:-}" ]; then
+    warn "WORK_DIR_GLOB unset in hooks/identities.local — no work-folder deny rule added"
+  else
+    res="$(python3 - "$LOCAL_SETTINGS" "$WORK_DIR_GLOB" <<'PY'
+import json, os, sys
+path, glob = sys.argv[1], sys.argv[2]
+rule = f"Read({glob})"
+try:
+    d = json.load(open(path))
+except Exception:
+    d = {}
+deny = d.setdefault("permissions", {}).setdefault("deny", [])
+if rule in deny:
+    print("present")
+else:
+    deny.append(rule)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
+        json.dump(d, f, indent=2)
+        f.write("\n")
+    print("added")
+PY
+)" || res="failed"
+    case "$res" in
+      present) ok "work-folder deny rule present in .claude/settings.local.json" ;;
+      added)   ok "work-folder deny rule added to .claude/settings.local.json" ;;
+      *)       err "could not update .claude/settings.local.json" ;;
+    esac
+  fi
+fi
+echo
+
 echo
 echo "Done — items flagged ⚠️ above are manual."

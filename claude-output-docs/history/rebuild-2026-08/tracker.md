@@ -25,8 +25,8 @@
 | 1.5 | 1 | Global CLAUDE.md | ✅ | — | Model-policy contradiction resolved keep-Opus direction; tiering table; LLMA env-var prohibition; work-leaning scope line |
 | 1.6 | 1 | Archive + delete personal residue | ✅ | — | agent-memory 9 files archived+deleted (verified identical first); plans: 15 work stay (incl. 2 boundary-referencing migration plans — conservative), 1 personal archived, executing plan PROTECTED; 5 global agents archived+deleted |
 | 1.7 | 1 | Hooks hardening | ✅ | `c64a5d8` | identities.local (gitignored, staged-block asserted) + `.labos-allow`; scratch matrix 6/6; self-test commit passed; pre-push first-push hole closed + secret backstop |
-| 1.8 | 1 | includeIf + smoke tests | ✅ | — | `gitdir/i:~/YaqeenProjects/**` after `[user]`; SMOKE B: virgin repo under YaqeenProjects resolves work email + passes work-profile hook; SMOKE C: JourneyOS resolves work email; personal profile proven by all run commits. Revert: delete includeIf block + `~/.gitconfig-work` |
-| 1.9 | 1 | Eviction hand-off | ✅ | `6cea198` (stub) | Detail → JourneyOS `.claude-work/plans/global-work-eviction.md` (gitignored, repo untouched); pointer stub in umbrella |
+| 1.8 | 1 | includeIf + smoke tests | ✅ | — | `gitdir/i:<work-projects-dir>/**` after `[user]`; SMOKE B: virgin repo under the work projects dir resolves work email + passes work-profile hook; SMOKE C: the work repo resolves work email; personal profile proven by all run commits. Revert: delete includeIf block + `~/.gitconfig-work` |
+| 1.9 | 1 | Eviction hand-off | ✅ | `6cea198` (stub) | Detail → the work repo's `.claude-work/plans/global-work-eviction.md` (gitignored, repo untouched); pointer stub in umbrella |
 | 2.0 | 2 | .gitignore surgery + tripwire | ✅ | `a6a8f1d` | /.github/ + /tests/ allowlisted (tripwire caught BOTH gaps live: canary file, then tests/); .claude narrowed; env anchored; check-tracked.sh in CI |
 | 2.1 | 2 | Generator v2 + registry lib | ✅ | `0bc2a10` | Shared lib (single ROOT, loud validate); showcase eligibility (catalog 2→5); one allowlist path; deterministic + --check; 7/7 default-deny tests; ai-ops.html + projects-corpus.json + pointer indexes |
 | 2.2 | 2 | Manifest policy reconciled | ✅ | `0bc2a10` | repo_public gating: 1 public row; 4 private/client rows → gitignored manifest.local.sh |
@@ -101,7 +101,7 @@
 |---|---|---|---|
 | D-1 | ACTION-REQUIRED | Qari PR #69 merge decision (nastaleeq fix — 1 unique commit) | Phase 0 PR enum |
 | D-2 | ACTION-REQUIRED | art PR #16 merge decision (firebase security-rule auto-deploy — 1 unique commit) | Phase 0 PR enum |
-| D-3 | DEBT (dated 2026-08-02) | Work eviction from global — execute from a work session; detail at JourneyOS `.claude-work/plans/global-work-eviction.md` | Phase 1.9 |
+| D-3 | DEBT (dated 2026-08-02) | Work eviction from global — execute from a work session; detail in the work repo's `.claude-work/plans/global-work-eviction.md` | Phase 1.9 |
 | D-5 | ACTION-REQUIRED | qari-assets: KFGQPC charitable-use/no-print clause lives only in commit f614411 + font name-tables — promote to a repo-level license note before more public visibility? | Dry-run history audit |
 | D-6 | ACTION-REQUIRED | qari-assets: was a GitHub Release ever published for tag qari-assets-4 (tag exists, workflow comment says never cut)? | Dry-run audits |
 | D-7 | DECISION (11 items) | qari-assets history/CHANGELOG: 11 `Inferred — needs review` markers (4 backfilled decisions + 7 reconstructed release sections) — owner review promotes IN_PROGRESS → READY | Promotion gate |

@@ -6,14 +6,12 @@ On-demand map of the umbrella. Load this when you need to know where something l
 | Path | Purpose |
 |---|---|
 | `CLAUDE.md` | Lean root context (loads every session — and as the auto-loaded ancestor of every project repo under this directory) |
+| `WORKING-RULES.md` · `VOICE.md` | Session rules and the writing standard, imported by `CLAUDE.md` so they load everywhere |
 | `DIRECTORY.md` | This index |
-| `now.md` | Current focus, high-signal |
-| `README.md` · `STATUS.md` · `ROADMAP.md` · `RELEASE-NOTES.md` | **Generated** catalog (do not hand-edit) |
-| `projects.json` | **Generated** machine artifact the portfolio consumes |
-| `docs/` | **Generated** public pages: `index.html` (catalog) · `ai-ops.html` (AI-operations showcase) · `projects-corpus.json` (future ingestion contract) |
+| `README.md` | **Generated** catalog table (do not hand-edit) |
+| `docs/` | **Generated** public pages: `index.html` (catalog) · `ai-ops.html` (AI-operations showcase) · `projects-corpus.json` (machine-readable records + doc index) |
 | `.gitignore` | Deny-all + allowlist (linchpin of public/private separation). `scripts/check-tracked.sh` trips on silent swallows |
 | `.labos-allow` | Path allowlist for the public-repo token scan in `hooks/pre-commit` (reviewer-gated changes) |
-| `.mcp.json` | **Policy marker** (`{}` — no project MCP servers by design; personal connectors are account-level) |
 | `hooks/` | `pre-commit` + `pre-push` identity guards (logic public; identifiers in gitignored `hooks/identities.local`) |
 | `.claude/` | Umbrella project settings + agents/skills (explicit-subpath allowlist; worktrees/local state never tracked) |
 | `registry/` | Source of truth for the catalog: `<project>.md` frontmatter (see `registry/README.md` for the v2 contract) · hand-authored `ai-ops-prose.md` · **generated** `<slug>-index.md` pointer indexes |
@@ -45,7 +43,7 @@ On-demand map of the umbrella. Load this when you need to know where something l
 |---|---|
 | `personal-projects/` | Qari, qari-assets, emnlabs_site |
 | `freelance-projects/` | art_is_everywear |
-| `pocs/` | bil-app |
+| `pocs/` | bil-app, safar |
 
 Each project's documentation lives in its own repo under `project-os/` — the generated
 `registry/<slug>-index.md` pointer indexes route into them from here.

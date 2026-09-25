@@ -160,7 +160,7 @@ def test_asof_stamp_is_stable_and_git_free():
         C.apply(arts, C.drifted(arts, root), [], root)
         arts = C.plan([m], C.load_prior(root), root, "2026-02-02")
         assert not C.drifted(arts, root), "unchanged content must keep its stamp"
-        assert "2026-01-01" in arts["STATUS.md"]
+        assert "2026-01-01" in arts[C.STAMP_FILE]
         changed = dict(m, summary="a new summary")
         arts = C.plan([changed], C.load_prior(root), root, "2026-03-03")
         for p in C.STAMPED:

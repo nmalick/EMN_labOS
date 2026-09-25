@@ -38,16 +38,33 @@ LOC="$REPO_ROOT/home-claude.local"
 # Claude derives the project slug from the PRIMARY absolute path: / _ . all become -
 MEM_REL="projects/$(printf '%s' "$PRIMARY_ROOT" | sed 's/[\/_.]/-/g')/memory"
 
-# Token classes. WORK: org-qualified + work-tool names (routing only — the pre-commit
-# scan uses a narrower set; see hooks/). CLIENT: freelance-client identifiers.
-WORK_TOKENS='yaqeen|journeyos|yaqeeninstitute|journey|ameen|clickup|granola|dua_app'
-CLIENT_TOKENS='aubreyorlando|aubrey orlando|admin/admin'
+# Token classes (routing only — the pre-commit scan uses a narrower set; see hooks/).
+# The lists themselves are machine-local: naming a work org in this tracked, public script is
+# exactly what the wall exists to prevent. Fail closed when they are missing. (2026-09)
+IDF=""
+for cand in "$REPO_ROOT/hooks/identities.local" "$PRIMARY_ROOT/hooks/identities.local" \
+            "$(git config --global core.hooksPath 2>/dev/null || true)/identities.local"; do
+  [ -f "$cand" ] && { IDF="$cand"; break; }
+done
+if [ -z "$IDF" ]; then
+  echo "snapshot: hooks/identities.local not found — refusing to run without the routing lists." >&2
+  exit 1
+fi
+# shellcheck source=/dev/null
+. "$IDF"
+WORK_TOKENS="${SNAPSHOT_WORK_TOKENS:-}"
+CLIENT_TOKENS="${SNAPSHOT_CLIENT_TOKENS:-}"
+WORK_PLUGINS="${SNAPSHOT_WORK_PLUGINS:-}"
+if [ -z "$WORK_TOKENS" ] || [ -z "$CLIENT_TOKENS" ]; then
+  echo "snapshot: SNAPSHOT_WORK_TOKENS / SNAPSHOT_CLIENT_TOKENS unset in $IDF — refusing." >&2
+  exit 1
+fi
 ROUTE_RE="${WORK_TOKENS}|${CLIENT_TOKENS}"
 # Paths ALWAYS private regardless of scan: memory (may hold anything) and the global
 # CLAUDE.md (previously routed private only by the coincidence of naming a work org).
 ALWAYS_LOCAL='^memory/|^CLAUDE\.md$'
-# Plugins never published (work tooling — publishing advertises the work stack).
-WORK_PLUGINS='posthog'
+# Plugins never published (work tooling — publishing advertises the work stack): WORK_PLUGINS,
+# sourced above from hooks/identities.local.
 # settings.json keys that publish. Everything else (permissions, env, enabledPlugins,
 # hooks, apiKeyHelper, ...) is excluded by default.
 SETTINGS_ALLOW='["model","statusLine","effortLevel","skipWorkflowUsageWarning","inputNeededNotifEnabled","agentPushNotifEnabled"]'
