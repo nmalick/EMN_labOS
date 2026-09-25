@@ -1,5 +1,25 @@
 [
   {
+    "name": "EMN_labOS",
+    "slug": "EMN_labOS",
+    "bucket": "personal",
+    "status": "active",
+    "stack": [
+      "Python",
+      "Bash",
+      "GitHub Actions"
+    ],
+    "live_url": "https://nmalick.github.io/EMN_labOS/",
+    "summary": "The umbrella OS itself \u2014 registry-driven public catalog, identity-wall git hooks, and one-command machine replication.",
+    "highlights": [],
+    "showcase": true,
+    "repo_url": "https://github.com/nmalick/EMN_labOS",
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
+    }
+  },
+  {
     "name": "Qari",
     "slug": "Qari",
     "bucket": "personal",

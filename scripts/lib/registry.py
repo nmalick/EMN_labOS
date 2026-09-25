@@ -18,6 +18,10 @@ import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 REG = os.path.join(ROOT, "registry")
+# Private projects: the tracked registry/ is world-readable, so an entry there describes the
+# project even when visibility keeps it out of every generated surface. Entries for private
+# projects live in registry.local/ (gitignored) and can never reach a public surface. (2026-09)
+REG_LOCAL = os.path.join(ROOT, "registry.local")
 
 PUBLIC_VIS = {"public", "anonymized"}
 BUCKETS = {"personal", "freelance", "poc"}
@@ -60,22 +64,29 @@ def parse_frontmatter(path):
     return meta, None
 
 
+SKIP_FILES = ("readme.md", "claude.md", "ai-ops-prose.md")
+
+
 def load():
-    """Load all registry entries. Returns (entries, errors)."""
+    """Load registry entries from registry/ (tracked) and registry.local/ (gitignored).
+    Returns (entries, errors). Each entry records `_local`: True when it came from
+    registry.local/, which validate() forbids from reaching a public surface."""
     entries, errors = [], []
-    for p in sorted(glob.glob(os.path.join(REG, "*.md"))):
-        base = os.path.basename(p)
-        if base.lower() == "readme.md" or base.endswith("-index.md") or base == "ai-ops-prose.md":
-            continue
-        meta, err = parse_frontmatter(p)
-        if err:
-            errors.append(f"{base}: {err}")
-            continue
-        if meta is None:
-            errors.append(f"{base}: unparsable")
-            continue
-        meta["_file"] = base
-        entries.append(meta)
+    for d, is_local in ((REG, False), (REG_LOCAL, True)):
+        for p in sorted(glob.glob(os.path.join(d, "*.md"))):
+            base = os.path.basename(p)
+            if base.lower() in SKIP_FILES or base.endswith("-index.md"):
+                continue
+            meta, err = parse_frontmatter(p)
+            if err:
+                errors.append(f"{base}: {err}")
+                continue
+            if meta is None:
+                errors.append(f"{base}: unparsable")
+                continue
+            meta["_file"] = base
+            meta["_local"] = is_local
+            entries.append(meta)
     return entries, errors
 
 
@@ -108,6 +119,9 @@ def validate(entries):
         lu = (m.get("live_url") or "").strip()
         if lu and not lu.startswith(("http://", "https://")):
             errors.append(f"{f}: live_url must be http(s): {lu!r}")
+        if m.get("_local") and is_public(m):
+            errors.append(f"{f}: registry.local/ entry is publication-eligible — CI never sees "
+                          f"that folder, so it would drift. Move it to registry/ to publish it.")
     return errors
 
 
