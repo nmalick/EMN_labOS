@@ -25,4 +25,8 @@ jobs:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
       - name: Doc freshness (TTL / citation rot / stale base)
-        run: python3 project-os/ops/check-freshness.py --root project-os --repo .
+        # The umbrella's script is canonical and the umbrella is public: fetch it instead of
+        # vendoring a copy per repo, or the copies rot apart silently.
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/nmalick/EMN_labOS/main/scripts/check-freshness.py -o /tmp/check-freshness.py
+          python3 /tmp/check-freshness.py --root project-os --repo .
