@@ -22,11 +22,17 @@ Every project repo gets: a thin root `CLAUDE.md` router, `.claude/` (settings), 
     ├── research/
     ├── design/
     ├── ops/                     ← verify.md, ref-map.md, secrets.md, backup.md, releases.md
-    └── analytics/
+    ├── analytics/
+    └── registry-entry.md        ← PRIVATE projects only (see registry-entry.template.md)
 ```
 
 Empty folders ship a stub README carrying an **honest negative assertion with evidence**
 (see stub-README.template.md) + full frontmatter so the freshness gate covers them.
+
+`registry-entry.md` exists only in **private** projects: the umbrella's `registry/` is
+world-readable, so a private project's entry lives with the project and the umbrella assembles
+the gitignored `registry.local/` from the clones (`scripts/collect-local-registry.py`). Public
+projects keep their entry in the umbrella's tracked `registry/` — that is what CI reads.
 
 ## Conventions (binding)
 

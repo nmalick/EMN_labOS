@@ -2,7 +2,7 @@
 
 Source of truth for the catalog. One file per project; `/catalog-sync` generates every public
 surface from these files. Parsed and validated by `scripts/lib/registry.py`, shared by
-`catalog_sync`, `gen_manifest` and the CI tests.
+`catalog_sync`, `check_clone_list` and the CI tests.
 
 **Flat scalars only.** The parser rejects YAML lists loudly; list-shaped fields are comma-joined
 strings.
@@ -56,7 +56,7 @@ deny decisions are auditable.
 ## Files that are not entries
 `README.md`, `CLAUDE.md`, `ai-ops-prose.md` and `*-index.md` are skipped by the loader
 (`SKIP_FILES` in `scripts/lib/registry.py`). Every other `.md` here must parse as an entry, or
-`catalog_sync` and `gen_manifest` exit non-zero and CI goes red.
+`catalog_sync` and `check_clone_list` exit non-zero and CI goes red.
 
 ## Generated neighbors
 `<slug>-index.md` files are generated pointer indexes, built from each project's own
@@ -68,13 +68,24 @@ entry behind it is deleted by `catalog_sync` and fails `--check`.
 `ai-ops-prose.md` is the one hand-authored file here: the prose for `docs/ai-ops.html`, kept
 identifier-free and never generated from hook or config source.
 
-## Manifest policy
-`gen_manifest.py` writes clone lines for `repo_public: true` entries into the tracked
-`manifest.sh`. Every other entry with a `repo_url` goes into the gitignored `manifest.local.sh`,
-maintained by the same script, sourced by `bootstrap.sh`, never committed.
+## Clone-list policy
+The project clone list is **not generated and not in this repo**. It is `clone-list.tsv` in the
+private config repo (`nmalick/labos-config`), hand-maintained, and read by `bootstrap.sh` as
+inert data. `manifest.sh`, `manifest.local.sh` and `gen_manifest.py` were retired with it
+(2026-09): a tracked public manifest could only ever list the one public repo, so a fresh
+machine cloned one repo out of six.
 
-`EMN_labOS.md` catalogues this repo itself. `gen_manifest.py` skips any entry whose `repo_url`
-matches this repo's own remote, so bootstrap never clones the umbrella into a bucket folder.
+Hand-maintaining a list drops the generator's guarantee that it matches this folder, so
+`scripts/check_clone_list.py` reports the difference instead — MISSING, EXTRA, MISMATCH. It is
+not a CI gate: CI never sees the private repo. Run it from `/labos-replicate` and the
+`/labos-maintenance` sweep.
+
+**When to update the list:** a new project with a `repo_url`, a repo rename or transfer, or a
+project retired. Adding a registry entry is not enough — nothing propagates it for you.
+
+`EMN_labOS.md` catalogues this repo itself. `check_clone_list.py` skips any entry whose
+`repo_url` matches this repo's own remote, and flags the umbrella as EXTRA if it ever appears in
+the list, so bootstrap never clones the umbrella into a bucket folder.
 
 **Repo URLs in this folder are not secret.** A tracked entry carries its `repo_url` whether or not
 the repo is public, so a private repo's URL is readable here; `repo_public` controls only whether

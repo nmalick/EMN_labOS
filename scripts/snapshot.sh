@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# EMN_labOS — snapshot: capture the portable subset of ~/.claude, and regenerate manifest.sh.
+# EMN_labOS — snapshot: capture the portable subset of ~/.claude.
 # Allowlist copy only — never `cp -r ~/.claude`. Run before committing any global-config change.
 #
 # Routing: scan-clean files → home-claude/ (PUBLIC, tracked); files matching work OR client
 # tokens → home-claude.local/ (gitignored, never published). Both restore on a fresh machine
-# via bootstrap.sh — the .local half only if you copy it over.
+# via bootstrap.sh — the .local half from the private config repo. This script only WRITES
+# home-claude.local/; publishing it is `scripts/labos-config.sh push`.
 #
 # Safety properties (2026-08 rebuild):
 #   - home-claude.local/ is SYNCED, never `rm -rf`'d — home-claude.local/archive/ is preserved
@@ -170,9 +171,9 @@ else
   cp -R "$STAGE_LOC/." "$LOC/"
 fi
 
-# --- regenerate the clone manifest from registry ---------------------------
-python3 "$REPO_ROOT/scripts/gen_manifest.py" >/dev/null
-echo "  manifest.sh regenerated"
+# NOTE: this used to regenerate manifest.sh here. The clone list moved to the private config
+# repo in the 2026-09 replication redesign, so there is nothing to generate — see
+# scripts/check_clone_list.py for the drift report that replaced the generator's guarantee.
 
 printf '  \033[32m✓\033[0m %s file(s) → home-claude/ (public)\n' "$n_pub"
 if [ "$n_loc" -gt 0 ]; then

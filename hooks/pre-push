@@ -26,6 +26,15 @@ else
   SECRET_RE="$SECRET_RE_COMMON|$PERSONAL_EXTRA_RE"
 fi
 
+# The designated private config repo — see the matching block in pre-commit. Its whole job is
+# to carry the token lists the secret sweep matches on, so the sweep could never pass there.
+# The gh-account check and the per-commit author sweep below STILL RUN. Personal profile only.
+IS_CONFIG=0
+if [ "$PROFILE" = "personal" ] && [ -n "${CONFIG_REPO_RE:-}" ] &&
+   printf '%s\n%s\n' "$remote" "$toplevel" | grep -qiE "$CONFIG_REPO_RE"; then
+  IS_CONFIG=1
+fi
+
 # gh resolution: absolute path first (GUI clients run hooks without a login shell,
 # so /opt/homebrew/bin is off PATH there). Distinguish "gh unavailable" from
 # "wrong account" — the former trains people toward --no-verify if misreported.
@@ -77,7 +86,11 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   fi
 
   # Secret sweep over the files as they stand at the pushed tip (merge/rebase/cherry-pick
-  # never fire pre-commit — this is the backstop). .gitignore exempt, allowlist honored.
+  # never fire pre-commit — this is the backstop). .gitignore exempt, allowlist honored,
+  # config repo exempt (IS_CONFIG above).
+  if [ "$IS_CONFIG" = "1" ]; then
+    continue
+  fi
   if [ "$remote_sha" = "$ZERO" ]; then
     changed="$(git diff --name-only --diff-filter=ACMR "$(git merge-base "$local_sha" "$(git rev-parse origin/HEAD 2>/dev/null || echo "$local_sha")" 2>/dev/null || echo "$local_sha^" 2>/dev/null)" "$local_sha" 2>/dev/null || git ls-tree -r --name-only "$local_sha")"
   else

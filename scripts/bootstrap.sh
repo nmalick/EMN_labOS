@@ -5,12 +5,20 @@
 #
 # Idempotent: clones are pulled/skipped if present; ~/.claude is backed up before any restore.
 #
+# Two repos, by design. The PUBLIC umbrella holds the OS and the rules. The PRIVATE config repo
+# (nmalick/labos-config) holds the machine-local data that cannot be published: identities.local,
+# the private half of the ~/.claude snapshot, and the project clone list. Before Phase B those
+# files were copied between machines by hand, and a machine that missed identities.local had a
+# fail-closed identity wall — every commit blocked — plus a clone list of exactly one repo.
+#
 # Flags / env:
 #   --config-only        restore ~/.claude from the snapshot ONLY. Skips gh auth, the umbrella
-#                        clone, project clones, AND the git identity + core.hooksPath setup —
-#                        i.e. it does NOT stand up the identity wall. A machine bootstrapped
-#                        with --config-only has config but no guards; run full mode for that.
-#   LABOS_UMBRELLA=<dir>  use an existing local umbrella instead of $HOME/EMN_labOS
+#                        clone, the config repo, project clones, AND the git identity +
+#                        core.hooksPath setup — i.e. it does NOT stand up the identity wall.
+#                        It restores from whatever home-claude{,.local}/ is already on disk.
+#   LABOS_UMBRELLA=<dir>     use an existing local umbrella instead of $HOME/EMN_labOS
+#   LABOS_CONFIG_REPO=<o/r>  private config repo (default nmalick/labos-config)
+#   LABOS_CONFIG_DIR=<dir>   where to clone it (default $HOME/.labos-config)
 # Test the restore path against an isolated home without auth/network:
 #   HOME=/tmp/labos-test LABOS_UMBRELLA="$PWD" bash scripts/bootstrap.sh --config-only
 set -uo pipefail
@@ -24,6 +32,9 @@ EMAIL="nmalicksn@gmail.com"
 UMBRELLA="${LABOS_UMBRELLA:-$HOME/EMN_labOS}"
 HOOKS="$UMBRELLA/hooks"
 CLAUDE_DIR="$HOME/.claude"
+CONFIG_REPO="${LABOS_CONFIG_REPO:-nmalick/labos-config}"
+CONFIG_DIR="${LABOS_CONFIG_DIR:-$HOME/.labos-config}"
+CLONE_LIST="$CONFIG_DIR/clone-list.tsv"
 # Claude derives a project slug from the absolute path: / _ . all become -
 # Derive it from $UMBRELLA rather than hardcoding, or memory restores to the
 # wrong path whenever $HOME or the umbrella location differs from this machine.
@@ -79,7 +90,18 @@ git config --global user.email "$EMAIL"
 git config --global core.hooksPath "$HOOKS"
 ok "name / email / hooksPath set"
 
-# --- 5) projects -----------------------------------------------------------
+# --- 5) private config repo ------------------------------------------------
+# Must precede BOTH the project clones (it carries the clone list) and the ~/.claude restore
+# (it carries home-claude.local/). Needs gh auth, so it never runs in --config-only.
+say "Private config → $CONFIG_DIR"
+LABOS_CONFIG_REPO="$CONFIG_REPO" LABOS_CONFIG_DIR="$CONFIG_DIR" LABOS_UMBRELLA="$UMBRELLA" \
+  bash "$UMBRELLA/scripts/labos-config.sh" clone || warn "config repo unavailable — continuing"
+if [ -d "$CONFIG_DIR" ]; then
+  LABOS_CONFIG_REPO="$CONFIG_REPO" LABOS_CONFIG_DIR="$CONFIG_DIR" LABOS_UMBRELLA="$UMBRELLA" \
+    bash "$UMBRELLA/scripts/labos-config.sh" restore
+fi
+
+# --- 6) projects -----------------------------------------------------------
 say "Projects"
 clone_repo() { # url bucket-dir slug
   local url="$1" bucket="$2" slug="$3" dest="$UMBRELLA/$2/$3"
@@ -92,18 +114,36 @@ clone_repo() { # url bucket-dir slug
     warn "$slug clone failed ($url)"
   fi
 }
-if [ -f "$UMBRELLA/manifest.sh" ]; then . "$UMBRELLA/manifest.sh"; else warn "manifest.sh missing"; fi
-if [ -f "$UMBRELLA/manifest.local.sh" ]; then
-  . "$UMBRELLA/manifest.local.sh"
+# The clone list is INERT DATA, never sourced: bootstrap does not execute a file it just
+# fetched from a repo. Format: <url>TAB<bucket-dir>TAB<slug>, '#' comments, blank lines skipped.
+if [ -f "$CLONE_LIST" ]; then
+  n=0
+  while IFS="$(printf '\t')" read -r url bucket slug || [ -n "${url:-}" ]; do
+    case "${url:-}" in ''|'#'*) continue ;; esac
+    [ -n "${bucket:-}" ] && [ -n "${slug:-}" ] || { warn "malformed clone-list row: ${url}"; continue; }
+    clone_repo "$url" "$bucket" "$slug"; n=$((n+1))
+  done < "$CLONE_LIST"
+  ok "$n row(s) from $(basename "$CLONE_LIST")"
 else
-  warn "manifest.local.sh absent — private repos skipped (copy it into $UMBRELLA/ to include them)"
+  warn "no clone list at $CLONE_LIST — no projects cloned."
+  warn "  It lives in the private config repo ($CONFIG_REPO). Without it this machine has the"
+  warn "  umbrella and nothing else."
 fi
 
-fi  # end full-only (preflight + auth + umbrella + identity + projects)
+# --- 7) private registry entries ------------------------------------------
+# Each private project repo carries its own project-os/registry-entry.md; the umbrella
+# assembles the gitignored registry.local/ from the clones it just made.
+if [ -x "$UMBRELLA/scripts/collect-local-registry.py" ] || [ -f "$UMBRELLA/scripts/collect-local-registry.py" ]; then
+  say "Private registry entries"
+  python3 "$UMBRELLA/scripts/collect-local-registry.py" || warn "registry.local assembly reported problems"
+fi
 
-# --- 6) global Claude config (~/.claude) -----------------------------------
-# Restored from two snapshots: home-claude/ (public) + home-claude.local/ (gitignored — the
-# CLAUDE.md/memory that name work orgs; present only if you copied it onto this machine).
+fi  # end full-only (preflight + auth + umbrella + identity + config repo + projects)
+
+# --- 8) global Claude config (~/.claude) -----------------------------------
+# Restored from two snapshots: home-claude/ (public, tracked in the umbrella) +
+# home-claude.local/ (gitignored — the CLAUDE.md/memory that name work orgs; restored from the
+# private config repo in step 5, or already on disk in --config-only mode).
 say "Claude config (~/.claude)"
 SNAP_PUB="$UMBRELLA/home-claude"
 SNAP_LOC="$UMBRELLA/home-claude.local"
@@ -141,7 +181,10 @@ if [ -d "$SNAP_PUB" ] || [ -d "$SNAP_LOC" ]; then
   chmod +x "$CLAUDE_DIR/statusline.sh" 2>/dev/null || true
   msrc="$(find_src memory)"
   if [ -n "$msrc" ]; then mkdir -p "$CLAUDE_DIR/$MEM_REL"; cp -R "$msrc/." "$CLAUDE_DIR/$MEM_REL/"; ok "restored memory"; fi
-  [ -d "$SNAP_LOC" ] || warn "home-claude.local/ absent — global CLAUDE.md + memory not restored (copy it over to include them)"
+  if [ ! -d "$SNAP_LOC" ]; then
+    warn "home-claude.local/ absent — global CLAUDE.md + memory not restored."
+    [ "$MODE" = "full" ] && warn "  It comes from the private config repo; check step 5 above."
+  fi
   ok "backed up prior config to $bak"
 else
   warn "no snapshot found — skipping config restore"
@@ -163,22 +206,29 @@ for c in personal-init labos-replicate catalog-sync; do
   fi
 done
 
-# --- 7) finalize -----------------------------------------------------------
+# --- 9) finalize -----------------------------------------------------------
 if [ "$MODE" = "full" ]; then
   say "Finalize"
   bash "$UMBRELLA/scripts/personal-init.sh" || true
   # Post-install assertion — a bootstrap that "succeeds" without the wall is the worst outcome.
+  # identities.local is part of the wall, not an optional extra: the hooks read it on every
+  # commit and BLOCK when it is missing. A machine with hooks but no identities.local cannot
+  # commit at all, so reporting success there is the exact failure Phase B set out to remove.
   hp="$(git config --global core.hooksPath 2>/dev/null || true)"
-  if [ -n "$hp" ] && [ -f "$hp/pre-commit" ] && [ -f "$hp/pre-push" ]; then
-    ok "identity wall verified: core.hooksPath=$hp (pre-commit + pre-push present)"
-  else
+  if [ -z "$hp" ] || [ ! -f "$hp/pre-commit" ] || [ ! -f "$hp/pre-push" ]; then
     die "identity wall NOT standing: core.hooksPath='$hp' has no pre-commit/pre-push. Fix before committing anything."
   fi
+  if [ ! -f "$hp/identities.local" ]; then
+    die "identity wall INCOMPLETE: $hp/identities.local is missing, so every commit will be
+     blocked. It lives in the private config repo ($CONFIG_REPO) — check step 5, then run:
+       bash $UMBRELLA/scripts/labos-config.sh clone && bash $UMBRELLA/scripts/labos-config.sh restore"
+  fi
+  ok "identity wall verified: core.hooksPath=$hp (pre-commit + pre-push + identities.local)"
 else
   say "Config-only restore complete"
 fi
 
-# --- 8) next steps ---------------------------------------------------------
+# --- 10) next steps --------------------------------------------------------
 [ "$MODE" = "full" ] || { ok "ran --config-only (auth/clone/projects skipped)"; exit 0; }
 say "Next steps (manual)"
 cat <<EOF
@@ -186,6 +236,6 @@ cat <<EOF
   • vercel login          (personal email) — if deploying
   • npm login             — only if you publish packages
   • flutter install       — required for Qari (https://docs.flutter.dev)
-  • Private repo skipped?  copy manifest.local.sh into $UMBRELLA/ and re-run
+  • Check clone-list drift: python3 $UMBRELLA/scripts/check_clone_list.py
 EOF
 ok "bootstrap complete"
