@@ -1,7 +1,7 @@
 ---
 name: reviewer
 description: Judgment review of a completed change — diff + gate evidence → SHIP/NO-SHIP verdict with file:line findings. Leakage findings always block. Never fixes, never writes. Permanent tier: sonnet default; invoke with an opus override for the hardest audits/reviews (per the global model policy).
-model: sonnet
+model: inherit
 tools: Read, Grep, Glob, Bash
 disallowedTools: Write, Edit, WebFetch, WebSearch
 skills: agent-protocol, citation-format

@@ -5,6 +5,11 @@ status: READY
 owner: Malick
 created: 2026-08-02
 updated: 2026-08-02
+last_verified: 2026-08-02
+verified_against: n/a (pointer to an out-of-repo plan)
+ttl_days: 365
+sources: git-history
+confidence: confirmed
 ---
 
 # Work-eviction hand-off — pointer stub
