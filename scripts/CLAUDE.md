@@ -13,8 +13,11 @@ generators own every public surface. Edits prompt for approval (the `ask` rule i
 | `check-freshness.py` | CI, `/labos-maintenance`, project CI via the doc-kit template | TTL expiry, citation rot, stale or missing verification base |
 | `snapshot.sh` | `/labos-replicate`, before committing config | Curated `~/.claude` → `home-claude/` and `home-claude.local/` |
 | `personal-init.sh` | Every session, and bootstrap | Account checks, plus the machine-local work-folder guard |
-| `bootstrap.sh` | A fresh machine, via curl | Clone, identity wall, projects, config restore |
-| `gen_manifest.py` | `/labos-replicate` | Clone lists from the registry |
+| `bootstrap.sh` | A fresh machine, via curl | Clone, identity wall, config repo, projects, `~/.claude` restore |
+| `gen_roster.py` | CI, `/labos-maintenance` | Generates `claude-output-docs/roster.md` from `.claude/`. `--check` is the drift gate |
+| `labos-config.sh` | `/labos-replicate`, bootstrap | The private config repo: `clone` · `restore` · `push` · `status` |
+| `check_clone_list.py` | `/labos-replicate` | Reports drift between `clone-list.tsv` and the registry. Not a CI gate — CI never sees the private repo |
+| `collect-local-registry.py` | `/labos-replicate`, `/labos-maintenance` | Assembles `registry.local/` from each cloned private project's own entry |
 
 ## Rules
 - **Fail closed.** A guard that cannot read its inputs exits non-zero instead of proceeding with
@@ -30,6 +33,12 @@ generators own every public surface. Edits prompt for approval (the `ask` rule i
 - **Distinguish failure modes in gate output.** A finding names the fix, so two causes that need
   different fixes are two findings — `STALE_BASE` (re-verify the doc) is not `UNKNOWN_BASE` (fetch,
   or the commit died with a squash-merged branch).
+- **Two folders cannot hold their own docs, so they are documented here.** `home-claude/` is wiped
+  and re-synthesised by `snapshot.sh`, and `bootstrap.sh` restores a `CLAUDE.md` found there as the
+  machine's global `~/.claude/CLAUDE.md` — so a note placed there is either deleted or applied to
+  every session on the machine, work included. `docs/` is published to the public web by GitHub
+  Pages, so anything in it is served at `nmalick.github.io/EMN_labOS/`. Both are generated output:
+  document them beside the generator, never inside the folder.
 - **After changing anything here**, run all four gates: `catalog_sync.py --check`,
-  `tests/test_default_deny.py`, `tests/test_freshness.py`, `check-tracked.sh`, and
-  `check-freshness.py --root claude-output-docs --repo .`.
+  `gen_roster.py --check`, `tests/test_default_deny.py`, `tests/test_freshness.py`,
+  `check-tracked.sh`, and `check-freshness.py --root claude-output-docs --repo .`.

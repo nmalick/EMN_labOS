@@ -24,8 +24,8 @@ the session's model — none is limited to a particular one.
 | `/citation-format` | reference (preloadable) | The exact citation grammar + CITATION_MANIFEST line format shared by the doc writer and the blind verifier. |
 | `/doc-kit-spec` | reference (preloadable) | The project-os doc-kit contract — folder layout, frontmatter fields, status taxonomy, supersession and negative-assertion rules. |
 | `/improve` | command (side-effecting) | Runs the improvement-backlog fix pass for a project — T1 fully, T2 only with a green deterministic gate, T3 never (decision list). |
-| `/labos-maintenance` | command (side-effecting) | Umbrella maintenance suite — doc TTL/citation freshness sweep, reference-integrity check, catalog + AI-ops + corpus regen, snapshot refresh… |
-| `/new-project` | command (side-effecting) | Scaffold a new project from templates/doc-kit — project-os folders, thin root CLAUDE.md router, .claude/ settings, a registry entry, and a manifest… |
+| `/labos-maintenance` | command (side-effecting) | Umbrella maintenance suite — doc TTL/citation freshness sweep, reference-integrity check, catalog + AI-ops + corpus regen, clone-list drift, snapshot… |
+| `/new-project` | command (side-effecting) | Scaffold a new project from templates/doc-kit — project-os folders, thin root CLAUDE.md router, .claude/ settings, and a registry entry. |
 | `/update-ref` | command (side-effecting) | Post-merge doc refresh for a project — reads merged PRs/commits since the arch-doc cursor, re-audits only the affected project-os surfaces… |
 
 Retired in the 2026-08 rebuild: `project-manager` (dead Telegram integration), `backend-eng` / `frontend-eng` (content → `templates/doc-kit/`), `qa` (superseded by `reviewer`).
