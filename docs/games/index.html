@@ -1,0 +1,63 @@
+<!doctype html>
+<!-- HAND-AUTHORED. Not emitted by scripts/catalog_sync.py, which writes only index.html,
+     ai-ops.html and projects-corpus.json in this folder and never scans or prunes the rest.
+     Served at games.emnlabs.io by a Vercel project whose Root Directory is docs/games. -->
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMN Labs — Games</title>
+<meta name="description" content="Small games and experiments from EMN Labs.">
+<link rel="icon" href="data:,">
+<style>
+ :root{
+   --bg:#fff; --ink:#1a1a1a; --muted:#666; --line:#e3e3e3; --card:#fff; --accent:#2f6fed;
+ }
+ @media (prefers-color-scheme: dark){
+   :root:not([data-theme="light"]){
+     --bg:#14161a; --ink:#e8eaed; --muted:#9aa0a8; --line:#2c313a; --card:#1c1f25; --accent:#6f9bff;
+   }
+ }
+ :root[data-theme="dark"]{
+   --bg:#14161a; --ink:#e8eaed; --muted:#9aa0a8; --line:#2c313a; --card:#1c1f25; --accent:#6f9bff;
+ }
+ *{box-sizing:border-box}
+ body{font-family:system-ui,sans-serif;max-width:880px;margin:0 auto;padding:2rem 1rem 3rem;
+      color:var(--ink);background:var(--bg);-webkit-text-size-adjust:100%}
+ h1{margin-bottom:.25rem}
+ .meta{color:var(--muted);font-size:.9rem;margin-top:.25rem}
+ .grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));margin-top:1.75rem}
+ .card{border:1px solid var(--line);border-radius:12px;padding:1rem;background:var(--card);
+       display:flex;flex-direction:column;gap:.35rem;text-decoration:none;color:inherit}
+ .card:hover{border-color:var(--accent)}
+ .card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+ .card h2{margin:.2rem 0;font-size:1.1rem}
+ .card p{margin:0}
+ .stack{color:var(--muted);font-size:.85rem}
+ .go{color:var(--accent);font-size:.9rem;margin-top:.35rem}
+ .note{color:var(--muted);font-size:.85rem;margin-top:.4rem}
+ nav{margin-top:2rem} nav a{color:var(--accent)}
+</style></head><body>
+ <h1>Games</h1>
+ <p class="meta">Small games and experiments from <a href="https://emnlabs.io">EMN Labs</a>.</p>
+
+ <div class="grid">
+   <a class="card" href="https://minesweeper.emnlabs.io">
+     <h2>Minesweeper</h2>
+     <p>The classic, in one self-contained page. Beginner through expert, plus custom boards,
+        chording, keyboard play and best times kept in your browser.</p>
+     <p class="stack">HTML, CSS, vanilla JavaScript</p>
+     <span class="go">Play &rarr;</span>
+   </a>
+
+   <a class="card" href="https://archaracter.emnlabs.io">
+     <h2>AR Character</h2>
+     <p>An animated character composited into your surroundings through the phone camera. Three
+        modes: a screen-locked stage, a roadside runner that vaults what goes past, and real
+        WebXR room placement.</p>
+     <p class="stack">three.js, WebXR, vanilla JavaScript</p>
+     <span class="go">Open &rarr;</span>
+     <span class="note">Best on a phone. Room mode needs Android or a headset.</span>
+   </a>
+ </div>
+
+ <nav><a href="https://emnlabs.io">&larr; emnlabs.io</a></nav>
+</body></html>
