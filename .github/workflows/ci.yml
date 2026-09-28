@@ -20,6 +20,8 @@ jobs:
         run: python3 tests/test_freshness.py
       - name: Catalog drift gate (generated surfaces match registry)
         run: python3 scripts/catalog_sync.py --check
+      - name: Roster drift gate (roster matches .claude/)
+        run: python3 scripts/gen_roster.py --check
       - name: Silent-swallow tripwire (deny-all .gitignore)
         run: bash scripts/check-tracked.sh
       - name: Doc freshness (deterministic — TTL / citation rot / stale base)

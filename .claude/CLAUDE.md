@@ -16,7 +16,7 @@ Agents, skills and commands for umbrella sessions only. Project repos have their
 ## Layout
 | Path | What |
 |---|---|
-| `agents/` | Fleet agents, one file each. Every file sets `model:` explicitly — the frontmatter default is `inherit`, which silently promotes a cheap agent to the session's tier |
+| `agents/` | Fleet agents, one file each. All carry `model: inherit`: an agent runs on the session's model and is never limited to another. `scripts/gen_roster.py` errors if one pins a model |
 | `skills/` | Skills invoked as `/<name>`. `agent-protocol`, `citation-format` and `doc-kit-spec` are reference-only, preloaded into agents |
 | `commands/` | Machine commands. Frontmatter must start on line 1 or the description is not parsed |
 | `worktrees/` | Agent worktrees, gitignored. Delete once their branch has merged |

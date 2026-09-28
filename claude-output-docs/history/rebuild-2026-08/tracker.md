@@ -1,6 +1,26 @@
+---
+title: 2026-08 rebuild — phase tracker and debt register
+type: history
+project: labos
+status: COMPLETE
+owner: Malick
+created: 2026-08-04
+updated: 2026-08-04
+last_verified: 2026-08-04
+verified_against: n/a (historical record)
+# An immutable record: its claims were true at the time, so it carries a long TTL
+# rather than asking to be re-verified every year.
+ttl_days: 3650
+sources: git-history
+confidence: confirmed
+---
+
 # Rebuild 2026-08 — Execution Tracker
 
-> Live status of the unattended rebuild run. Updated after every task. Plan: `~/.claude/plans/magical-splashing-phoenix.md` (v3, approved 2026-08-02). Raw research: `~/Archive/labos-rebuild-2026-08/reports/` (22 files, private).
+> Live status of the unattended rebuild run, updated after every task.
+>
+> Plan: `~/.claude/plans/magical-splashing-phoenix.md` (v3, approved 2026-08-02).
+> Raw research: `~/Archive/labos-rebuild-2026-08/reports/` (22 files, private).
 
 ## Task log
 

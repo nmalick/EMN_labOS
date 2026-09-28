@@ -1,6 +1,26 @@
+---
+title: Context & routing baseline — before the 2026-08 rebuild
+type: history
+project: labos
+status: COMPLETE
+owner: Malick
+created: 2026-08-02
+updated: 2026-08-02
+last_verified: 2026-08-02
+verified_against: n/a (historical record)
+# An immutable record: its claims were true at the time, so it carries a long TTL
+# rather than asking to be re-verified every year.
+ttl_days: 3650
+sources: git-history
+confidence: confirmed
+---
+
 # Context & Routing Baseline — before the 2026-08 rebuild
 
-Captured 2026-08-02 at Phase 0/1 boundary. The Phase 5 after-measurement diffs against this file. Goal-2 evidence: "any Claude surface finds project information cheaply."
+Captured 2026-08-02, at the Phase 0/1 boundary. The Phase 5 after-measurement diffs against this
+file.
+
+Goal-2 evidence: "any Claude surface finds project information cheaply."
 
 ## Machine/config surface (before)
 
@@ -17,7 +37,12 @@ Captured 2026-08-02 at Phase 0/1 boundary. The Phase 5 after-measurement diffs a
 
 ## Routing probe (before) — tokens/files to answer 5 standing questions per project
 
-Methodology: for each question, the files a fresh session must open **today** (no `project-os/`) to answer correctly, per the verified scan reports; ≈tokens = file bytes ÷ 4. "Docs misleading" = a doc exists that answers it WRONG (worse than absent — the session must also detect the lie).
+Methodology: for each question, the files a fresh session must open **today**, with no
+`project-os/`, to answer correctly — per the verified scan reports. Tokens are estimated as file
+bytes ÷ 4.
+
+"Docs lie" means a doc exists and answers the question wrongly. That is worse than no doc: the
+session has to detect the lie before it can answer.
 
 ### Qari
 | Q | Answerable from docs today? | Files to open | ≈tokens |

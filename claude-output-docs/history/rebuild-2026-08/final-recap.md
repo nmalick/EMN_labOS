@@ -1,3 +1,20 @@
+---
+title: 2026-08 rebuild — final recap and merge runbook
+type: history
+project: labos
+status: COMPLETE
+owner: Malick
+created: 2026-08-04
+updated: 2026-08-04
+last_verified: 2026-08-04
+verified_against: n/a (historical record)
+# An immutable record: its claims were true at the time, so it carries a long TTL
+# rather than asking to be re-verified every year.
+ttl_days: 3650
+sources: git-history
+confidence: confirmed
+---
+
 # EMN_labOS rebuild 2026-08 — FINAL RECAP (merge runbook)
 
 **Status:** rebuild complete on the automation side. Nothing below was merged by automation —

@@ -1,7 +1,7 @@
 ---
 name: doc-verifier
 description: BLIND mechanical verification of generated docs — citation existence, symbol existence, frontmatter completeness, TTL staleness. Never sees the writer's reasoning; never rewrites. Fleet use via /baseline-audit and /labos-maintenance.
-model: haiku
+model: inherit
 tools: Read, Grep, Glob, Bash
 disallowedTools: Write, Edit, WebFetch, WebSearch
 skills: citation-format

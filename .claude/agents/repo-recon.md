@@ -1,7 +1,7 @@
 ---
 name: repo-recon
 description: Bounded reconnaissance of a repo — inventory, stack facts, entry points, git archaeology, build commands. Produces a facts-only recon brief; never interpretation. Fleet use via /baseline-audit.
-model: haiku
+model: inherit
 tools: Read, Grep, Glob, Bash
 disallowedTools: Edit, Write, WebFetch, WebSearch
 skills: agent-protocol

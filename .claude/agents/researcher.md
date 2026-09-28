@@ -1,7 +1,7 @@
 ---
 name: researcher
 description: Deep research — web, docs, or repo. Checks existing research first, cites everything, distinguishes CONFIRMED / INFERRED / UNKNOWN. Slow and thorough by design; not for quick answers.
-model: sonnet
+model: inherit
 tools: Read, Write, Glob, Grep, Bash, WebSearch, WebFetch
 memory: project
 ---
