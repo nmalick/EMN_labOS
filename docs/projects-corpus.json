@@ -40,6 +40,29 @@
     }
   },
   {
+    "name": "AR Character",
+    "slug": "ar-character",
+    "bucket": "poc",
+    "status": "poc",
+    "stack": [
+      "three.js",
+      "WebXR",
+      "vanilla JavaScript",
+      "Vercel"
+    ],
+    "live_url": "https://archaracter.emnlabs.io",
+    "summary": "An animated character composited into your surroundings through the phone camera \u2014 three modes, no build step.",
+    "highlights": [
+      "Stage and Road run on iPhone",
+      "Parkour timing decoupled from a 12 Hz detector",
+      "three.js vendored with zero runtime network calls"
+    ],
+    "doc_index": {
+      "has_kit": true,
+      "cursor": "Repo**: nmalick/ar-character \u00b7 **Last commit checked**: `689f537` (2026-09-28) \u00b7 **Last updated**: 2026-09-28"
+    }
+  },
+  {
     "name": "Art is Everywear",
     "slug": "art_is_everywear",
     "bucket": "freelance",
@@ -96,6 +119,29 @@
     "doc_index": {
       "has_kit": true,
       "cursor": "Repo**: nmalick/emnlabs_site \u00b7 **Last commit checked**: `ac17262` (2026-07-19) \u00b7 **Last updated**: 2026-08-03"
+    }
+  },
+  {
+    "name": "Minesweeper",
+    "slug": "minesweeper",
+    "bucket": "poc",
+    "status": "live",
+    "stack": [
+      "HTML",
+      "CSS",
+      "vanilla JavaScript",
+      "Vercel"
+    ],
+    "live_url": "https://minesweeper.emnlabs.io",
+    "summary": "Classic Minesweeper as one self-contained page \u2014 no build step, no dependencies.",
+    "highlights": [
+      "Engine gated by 1010 assertions in CI",
+      "Chording and full keyboard play",
+      "Light and dark themes"
+    ],
+    "doc_index": {
+      "has_kit": false,
+      "cursor": ""
     }
   },
   {
