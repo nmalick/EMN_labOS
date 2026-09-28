@@ -1,7 +1,6 @@
 # Paths exempt from the labOS public-repo token scan (hooks/pre-commit).
 # These files legitimately DESCRIBE the identity wall or carry user-approved public
 # fields (the client's live_url). Adding a path here is a reviewer-gated change.
-hooks/
 registry/
 README.md
 docs/
