@@ -31,7 +31,6 @@
 !/scripts/**
 !/home-claude/
 !/home-claude/**
-!/manifest.sh
 !/.labos-allow
 !/.github/
 !/.github/**
@@ -53,8 +52,6 @@
 # Per-machine Claude overrides (local paths; never publish)
 .claude/settings.local.json
 **/settings.local.json
-# Private clone manifest (freelance/client repos kept out of the public umbrella)
-/manifest.local.sh
 # Private config snapshot (CLAUDE.md/memory naming work orgs — never published)
 /home-claude.local/
 .claude/**/*.lock

@@ -26,6 +26,21 @@ else
   PROFILE=personal; EXPECTED="$PERSONAL_EMAIL"; SECRET_RE="$SECRET_RE_COMMON|$PERSONAL_EXTRA_RE"
 fi
 
+# The designated private config repo (CONFIG_REPO_RE — machine-local, like every other
+# identifier here) is the ONE repo allowed to hold the machine-local identity data in git.
+# It is private, personal-account-only, and it exists so a fresh machine can restore
+# hooks/identities.local — without it the hooks fail closed and every commit is blocked.
+# The AUTHOR CHECK STILL RUNS there. Only two things are skipped: the identities.local
+# filename rule, and the secret-content scan — that file's entire purpose is to carry the
+# token lists the scan looks for, so the scan can never pass on it. Personal profile only:
+# a repo matching both WORK_MATCH_RE and CONFIG_REPO_RE is a misconfiguration, not an
+# exception, and keeps the full scan.
+IS_CONFIG=0
+if [ "$PROFILE" = "personal" ] && [ -n "${CONFIG_REPO_RE:-}" ] &&
+   printf '%s\n%s\n' "$remote" "$toplevel" | grep -qiE "$CONFIG_REPO_RE"; then
+  IS_CONFIG=1
+fi
+
 # Author check — config AND effective ident (catches GIT_AUTHOR_EMAIL= laundering).
 [ "$(git config user.email)" = "$EXPECTED" ] || { echo "BLOCKED [$PROFILE]: git config user.email != $EXPECTED" >&2; exit 1; }
 case "$(git var GIT_AUTHOR_IDENT 2>/dev/null)" in
@@ -33,8 +48,9 @@ case "$(git var GIT_AUTHOR_IDENT 2>/dev/null)" in
   *) echo "BLOCKED [$PROFILE]: effective author ident != $EXPECTED (env override?)" >&2; exit 1 ;;
 esac
 
-# identities.local must never be staged, anywhere.
-if git diff --cached --name-only -z | tr '\0' '\n' | grep -qE '(^|/)identities\.local$'; then
+# identities.local must never be staged, anywhere — except in the designated config repo,
+# whose job is to carry it (see IS_CONFIG above).
+if [ "$IS_CONFIG" = "0" ] && git diff --cached --name-only -z | tr '\0' '\n' | grep -qE '(^|/)identities\.local$'; then
   echo "BLOCKED [$PROFILE]: hooks/identities.local is staged — it is machine-local by design." >&2
   exit 1
 fi
@@ -60,8 +76,9 @@ git diff --cached --name-only -z --diff-filter=ACMR | tr '\0' '\n' | while IFS= 
   [ -n "$f" ] || continue
   path_in_list "$f" "$ALLOW_LOCAL" && continue
   base="${f##*/}"
-  # Secret scan (index blob, not worktree). .gitignore exempt by design.
-  if [ "$base" != ".gitignore" ]; then
+  # Secret scan (index blob, not worktree). .gitignore exempt by design; the config repo is
+  # exempt because it stores the token lists themselves.
+  if [ "$base" != ".gitignore" ] && [ "$IS_CONFIG" = "0" ]; then
     if git show ":$f" 2>/dev/null | grep -qIE "$SECRET_RE"; then
       echo "BLOCKED [$PROFILE]: secret-shaped content in staged blob: $f" >&2
       echo 1 >> "$tmpfail"

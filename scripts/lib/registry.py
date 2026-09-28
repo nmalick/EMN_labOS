@@ -2,7 +2,8 @@
 registry — shared loader/validator for EMN_labOS registry frontmatter.
 
 Single source of truth for: ROOT resolution, frontmatter parsing, eligibility
-rules, and validation. Consumed by catalog_sync.py, gen_manifest.py, and tests.
+rules, and validation. Consumed by catalog_sync.py, check_clone_list.py,
+collect-local-registry.py, and tests.
 
 Design rules (2026-08 rebuild):
 - ROOT is defined HERE, once. Importers must not recompute it (depth-sensitive).
@@ -31,8 +32,9 @@ REQUIRED_KEYS = ["name", "slug", "bucket", "visibility", "status", "summary"]
 # repo_public; mcps joins only when bucket != freelance (client tooling stays private).
 PUBLIC_FIELDS = ["name", "slug", "bucket", "status", "stack", "live_url", "summary", "highlights"]
 LIST_FIELDS = ("stack", "mcps", "highlights")
-# repo_url is interpolated into manifest.sh, which bootstrap.sh SOURCES — restrict
-# to shell-inert characters.
+# repo_url reaches the clone list, which bootstrap reads as INERT DATA (never sourced) and
+# hands to `git clone`. Kept shell-inert regardless: the URL still crosses a shell boundary as
+# an argument, and the constraint has never cost anything.
 REPO_URL_RE = re.compile(r"^[A-Za-z0-9@:/._+~-]*$")
 
 

@@ -18,7 +18,6 @@ freelance-projects
 pocs
 home-claude.local
 registry.local
-manifest.local.sh
 .DS_Store
 .env
 '

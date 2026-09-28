@@ -6,7 +6,8 @@ The linchpin invariant: a registry entry reaches a public surface ONLY when
 Every combination of the four gate dimensions is exercised; private entries must
 appear in NO generated artifact, including the corpus (a second private→public route).
 Also: allowlist proof (a junk field never propagates), freelance-mcps gate, and
-shell-safety of repo_url. And the 2026-09 gate-soundness fixes: kit-derived content is
+shell-safety of repo_url, and that the umbrella is never cloned into its own bucket. And the
+2026-09 gate-soundness fixes: kit-derived content is
 carried forward (never faked as "pre-baseline") when the project folder is absent, orphaned
 index files are drift and get deleted, and the "as of" stamp does not depend on git history.
 
@@ -23,7 +24,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "scripts", "lib"))
 sys.path.insert(0, os.path.join(HERE, "..", "scripts"))
 import registry as R  # noqa: E402
 import catalog_sync as C  # noqa: E402
-import gen_manifest as M  # noqa: E402
+import check_clone_list as M  # noqa: E402
 
 
 def entry(visibility, live, repo_pub, showcase, name="P", slug="p", bucket="personal"):
@@ -209,9 +210,11 @@ def test_loader_skips_non_entry_files():
     assert {m["slug"]: m["_local"] for m in entries} == {"real": False, "hidden-zq": True}
 
 
-def test_manifest_never_clones_the_umbrella_into_itself():
-    # The umbrella catalogues itself, so gen_manifest must recognise its own remote in any form
-    # and skip it — otherwise bootstrap clones this repo into personal-projects/.
+def test_clone_list_never_clones_the_umbrella_into_itself():
+    # The umbrella catalogues itself, so the clone-list checker must recognise its own remote in
+    # any form and skip it — otherwise bootstrap clones this repo into personal-projects/.
+    # Inherited from the retired gen_manifest.py, which enforced this when it GENERATED the
+    # manifest; the list is now hand-maintained, so the invariant lives in the drift report.
     own = "https://github.com/nmalick/EMN_labOS.git"
     for variant in (own, "https://github.com/nmalick/EMN_labOS",
                     "git@github.com:nmalick/EMN_labOS.git", "HTTPS://GitHub.com/nmalick/EMN_labOS/"):
