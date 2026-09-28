@@ -1,10 +1,11 @@
 # doc-kit — the project-os/ template set
 
-Every project repo gets: a thin root `CLAUDE.md` router, `.claude/` (settings), and
-**`project-os/`** holding all documentation. Code never moves; root additionally keeps
-`README*`, `LICENSE*`, `AGENTS.md` (vendor-managed where present), and all code/config/CI
-(`ALWAYS_ROOT`). `README.md` is rewritten in place as a public-facing summary linking into
-`project-os/`.
+Every project repo gets a thin root `CLAUDE.md` router, `.claude/` settings, and
+**`project-os/`** holding all documentation.
+
+Code never moves. The root also keeps `README*`, `LICENSE*`, `AGENTS.md` (vendor-managed where
+present) and all code, config and CI — the `ALWAYS_ROOT` set. `README.md` is rewritten in place as
+a public-facing summary that links into `project-os/`.
 
 ## Kit layout
 
@@ -25,8 +26,12 @@ Every project repo gets: a thin root `CLAUDE.md` router, `.claude/` (settings), 
     └── analytics/
 ```
 
-Empty folders ship a stub README carrying an **honest negative assertion with evidence**
-(see stub-README.template.md) + full frontmatter so the freshness gate covers them.
+A project may add a folder the kit doesn't list when it earns one (for example a
+`knowledge-base/` for an upstream research corpus). It documents it in its own `DIRECTORY.md`.
+
+Empty folders ship a stub README carrying an **honest negative assertion with evidence** (see
+`stub-README.template.md`) plus full frontmatter, so the freshness gate covers them rather than
+skipping them as untracked.
 
 ## Conventions (binding)
 
@@ -38,6 +43,6 @@ Empty folders ship a stub README carrying an **honest negative assertion with ev
   evidence ("No X anywhere in Y — confirmed from <file:line>, <sha>").
 - The umbrella's `CLAUDE.md` is an auto-loaded ancestor of every project under it — project
   routers never restate identity/account rules. `claudeMdExcludes` is the escape hatch.
-- Legacy docs migrate per a written mapping table; pure `git mv` commit (SHA recorded in
-  history/ as the archaeology boundary) + a second link-rewrite commit. Runtime-consumed
-  paths NEVER move (pre-migration `git grep` gate reclassifies hits to STAYS).
+- Legacy docs migrate per a written mapping table: one pure `git mv` commit, whose SHA is
+  recorded in `history/` as the archaeology boundary, then a second commit that rewrites links.
+- Runtime-consumed paths never move. A pre-migration `git grep` reclassifies any such hit to STAYS.

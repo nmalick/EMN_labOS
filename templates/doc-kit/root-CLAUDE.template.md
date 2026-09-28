@@ -11,5 +11,6 @@ questions — read it BEFORE re-reading the code.
 - Code layout: <2-4 bullet map of the real top-level code dirs — pointers, not prose>.
 - Conventions for docs (frontmatter, citations): `project-os/CLAUDE.md` (auto-loads on demand).
 
-<!-- art_is_everywear variant ONLY: keep `@AGENTS.md` as the FIRST line of the file (the
-     Next.js toolchain regenerates AGENTS.md; never migrate or edit it), then this body. -->
+<!-- If a vendor toolchain regenerates AGENTS.md in this repo (some JS frameworks do), keep
+     `@AGENTS.md` as the FIRST line of this file, then this body. Never migrate or edit that
+     file — the toolchain owns it. -->
