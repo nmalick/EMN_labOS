@@ -106,18 +106,33 @@ if [ -n "$shown" ]; then printf '%s\n' "$shown"; else warn "select the 'Personal
 # .claude/settings.local.json, so the public repo never names it.
 echo "Work-folder read guard:"
 UMBRELLA="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-IDF="$UMBRELLA/hooks/identities.local"
-LOCAL_SETTINGS="$UMBRELLA/.claude/settings.local.json"
-if [ ! -f "$IDF" ]; then
-  warn "hooks/identities.local missing — cannot add the work-folder deny rule"
+# A worktree carries its own hooks/ without the gitignored identities file, so resolve it the way
+# scripts/snapshot.sh does: this checkout, then the primary checkout, then the configured hooks
+# path. Writing the rule only into a worktree would also be useless — worktrees are disposable —
+# so the primary checkout is always a target. (2026-09)
+PRIMARY="$(dirname "$(git -C "$UMBRELLA" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || echo "$UMBRELLA/.git")")"
+# Pick the first candidate that actually DEFINES the path — a worktree can hold a stale copy
+# that predates the variable, and taking it would silently skip the guard.
+IDF=""; IDF_ANY=""
+for cand in "$PRIMARY/hooks/identities.local" "$UMBRELLA/hooks/identities.local" \
+            "$(git config --global core.hooksPath 2>/dev/null || true)/identities.local"; do
+  [ -f "$cand" ] || continue
+  [ -n "$IDF_ANY" ] || IDF_ANY="$cand"
+  if ( . "$cand" >/dev/null 2>&1; [ -n "${WORK_DIR_GLOB:-}" ] ); then IDF="$cand"; break; fi
+done
+[ -n "$IDF" ] || IDF="$IDF_ANY"
+if [ -z "$IDF" ]; then
+  warn "hooks/identities.local not found (this checkout, $PRIMARY, core.hooksPath) — no work-folder deny rule"
 elif ! command -v python3 >/dev/null 2>&1; then
   warn "python3 missing — cannot update .claude/settings.local.json"
 else
   # shellcheck source=/dev/null
   . "$IDF"
   if [ -z "${WORK_DIR_GLOB:-}" ]; then
-    warn "WORK_DIR_GLOB unset in hooks/identities.local — no work-folder deny rule added"
+    warn "WORK_DIR_GLOB unset in $IDF — no work-folder deny rule added"
   else
+    for LOCAL_SETTINGS in "$PRIMARY/.claude/settings.local.json" "$UMBRELLA/.claude/settings.local.json"; do
+    [ -e "$(dirname "$LOCAL_SETTINGS")" ] || continue
     res="$(python3 - "$LOCAL_SETTINGS" "$WORK_DIR_GLOB" <<'PY'
 import json, os, sys
 path, glob = sys.argv[1], sys.argv[2]
@@ -139,10 +154,12 @@ else:
 PY
 )" || res="failed"
     case "$res" in
-      present) ok "work-folder deny rule present in .claude/settings.local.json" ;;
-      added)   ok "work-folder deny rule added to .claude/settings.local.json" ;;
-      *)       err "could not update .claude/settings.local.json" ;;
+      present) ok "deny rule present: ${LOCAL_SETTINGS#$HOME/}" ;;
+      added)   ok "deny rule added: ${LOCAL_SETTINGS#$HOME/}" ;;
+      *)       err "could not update ${LOCAL_SETTINGS#$HOME/}" ;;
     esac
+    [ "$PRIMARY" = "$UMBRELLA" ] && break
+    done
   fi
 fi
 echo

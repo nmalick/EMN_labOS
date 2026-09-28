@@ -5,7 +5,8 @@ check-freshness — deterministic doc-freshness gate (no model involved).
 Parses YAML frontmatter of every doc under the given roots and fails when:
   - `last_verified` + `ttl_days` < today            (TTL expiry)
   - any `sources:` file:line no longer resolves      (citation rot)
-  - `verified_against` is not an ancestor of origin/main (code moved since verification)
+  - `verified_against` exists but is not an ancestor of origin/main (code moved: STALE_BASE)
+  - `verified_against` is not in this clone at all   (fetch, or squash-merged away: UNKNOWN_BASE)
 
 Frontmatter contract (flat scalars; sources comma-joined `path:line` pairs):
   last_verified: YYYY-MM-DD · ttl_days: N · verified_against: <sha> · sources: a.py:12, b.ts:40
@@ -97,8 +98,13 @@ def main():
                 if va and re.fullmatch(r"[0-9a-f]{7,40}", va):
                     r = subprocess.run(["git", "-C", repo, "merge-base", "--is-ancestor", va, "origin/main"],
                                        capture_output=True)
-                    if r.returncode not in (0,):
-                        findings.append(f"STALE_BASE     {p} (verified_against {va[:12]} not an ancestor of origin/main)")
+                    # git exits 1 for "exists but not an ancestor" and 128 for "not in this clone".
+                    # They need different fixes, so they are different findings: a SHA can vanish
+                    # from a clone when a branch is squash-merged and deleted. (2026-09)
+                    if r.returncode == 1:
+                        findings.append(f"STALE_BASE     {p} (verified_against {va[:12]} not an ancestor of origin/main — re-verify)")
+                    elif r.returncode != 0:
+                        findings.append(f"UNKNOWN_BASE   {p} (verified_against {va[:12]} is not in this clone — fetch, or it died with a squash-merged branch)")
                 elif va and not va.lower().startswith("n/a"):
                     findings.append(f"BAD_BASE       {p} (verified_against {va[:20]!r} is neither a SHA nor an 'n/a' sentinel)")
 
