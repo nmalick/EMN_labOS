@@ -4,7 +4,7 @@
 
 **The lab operating system**: a public umbrella for Malick Ndiaye's private projects — part machine OS (identity separation, replication, config hygiene), part showcase (project inventory + the AI-operations architecture itself). Projects live as private repos; this repo publishes only registry-gated metadata and the OS tooling.
 
-_Catalog as of the latest registry change: 2026-09-28_
+_Catalog as of the latest registry change: 2026-10-25_
 
 ## Projects
 
@@ -18,6 +18,7 @@ _Catalog as of the latest registry change: 2026-09-28_
 | EMN Labs | personal | live | Personal portfolio and EMN Labs showcase site. | React, Vite, Firebase, Vercel | [live](https://emnlabs.io) |
 | Minesweeper | poc | live | Classic Minesweeper as one self-contained page — no build step, no dependencies. | HTML, CSS, vanilla JavaScript, Vercel | [live](https://minesweeper.emnlabs.io) |
 | qari-assets | personal | support | Quranic fonts and Tajweed typesetting assets consumed by the Qari app. | Fonts, Python | [repo](https://github.com/nmalick/qari-assets) |
+| SOXLA | personal | active | Marketplace connecting informal-sector pros in Senegal and the diaspora with customers; coming-soon site with a pro and customer waitlist. | Next.js, TypeScript, Tailwind CSS, Vercel Blob, Vercel | [live](https://soxla.io) |
 
 ## The OS itself
 The showcase artifact is this repo's structure: registry-driven generated catalog (default-deny), identity-wall git hooks, machine replication (`scripts/bootstrap.sh`), an allowlist-synthesized public config snapshot (`home-claude/`), and the AI-ops surface ([docs/ai-ops.html](docs/ai-ops.html)). Start at [CLAUDE.md](CLAUDE.md).

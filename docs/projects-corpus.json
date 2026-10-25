@@ -162,5 +162,33 @@
       "has_kit": true,
       "cursor": "Repo**: nmalick/qari-assets \u00b7 **Last commit checked**: `4f8972d` (2026-06-28) \u00b7 **Last updated**: 2026-08-02"
     }
+  },
+  {
+    "name": "SOXLA",
+    "slug": "soxla",
+    "bucket": "personal",
+    "status": "active",
+    "stack": [
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS",
+      "Vercel Blob",
+      "Vercel"
+    ],
+    "live_url": "https://soxla.io",
+    "summary": "Marketplace connecting informal-sector pros in Senegal and the diaspora with customers; coming-soon site with a pro and customer waitlist.",
+    "highlights": [
+      "French and English coming-soon page",
+      "Pro and customer waitlist",
+      "Migrated off WordPress and HivePress"
+    ],
+    "mcps": [
+      "vercel",
+      "notion"
+    ],
+    "doc_index": {
+      "has_kit": true,
+      "cursor": "Repo**: nmalick/soxla (private) \u00b7 **Last commit checked**: `89a349a` (2026-10-25) \u00b7 **Last updated**: 2026-10-25"
+    }
   }
 ]
