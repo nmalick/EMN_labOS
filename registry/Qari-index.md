@@ -4,9 +4,10 @@
 
 _Generated pointer into the project's own `project-os/`; content lives in the project repo._
 
-> Repo**: nmalick/Qari · **Last commit checked**: `00b7558` (2026-08-02) · **Last updated**: 2026-08-03
+> **Repo**: nmalick/Qari · **Last commit checked**: `00b7558` (2026-08-02) · **Last updated**: 2026-08-03
 
 | Doc | Contains | Reference when |
+|---|---|---|
 | engineering/architecture.md | Code-verified architecture (289 claims): real state layer (9 singleton ChangeNotifiers — the Riverpod claim is a documented myth), module map, AI mode, data layer, asset-pin contract, CI gotchas | Any stack/structure question — BEFORE reading code |
 | product/features.md | Feature inventory, applicability-matrix style — SHIPPED/PARTIAL/PIVOTED/PLANNED-NOT-BUILT rows with evidence | What exists vs what was promised |
 | product/status.md | Current one-page status (supersedes the frozen 2025 snapshot) | Quick state check |

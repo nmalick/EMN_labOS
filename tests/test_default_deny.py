@@ -133,6 +133,9 @@ def test_kit_on_disk_wins_over_committed():
                 f.write("> **Last commit checked**: `abc1234`\n")
             idx = C.render_all([m], "2026-01-01", prior)[C.index_path("p")]
             assert "fresh-row" in idx and "abc1234" in idx and "STALE-BODY" not in idx
+            # Rendered markdown stays intact: bold cursor, and a separator so the table renders.
+            assert "> **Last commit checked**: `abc1234`" in idx, idx
+            assert "| Doc | Contains | When |\n|---|---|---|\n| a.md | fresh-row | x |" in idx, idx
         finally:
             R.project_dir = orig
 

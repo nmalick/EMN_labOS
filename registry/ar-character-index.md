@@ -4,9 +4,10 @@
 
 _Generated pointer into the project's own `project-os/`; content lives in the project repo._
 
-> Repo**: nmalick/ar-character · **Last commit checked**: `689f537` (2026-09-28) · **Last updated**: 2026-09-28
+> **Repo**: nmalick/ar-character · **Last commit checked**: `689f537` (2026-09-28) · **Last updated**: 2026-09-28
 
 | Doc | Contains | Reference when |
+|---|---|---|
 | engineering/architecture.md | Code-verified architecture reference (cursor header): stack, module map, capability gate, gotchas | Any stack/structure question — BEFORE reading code |
 | product/features.md | Feature inventory across the three modes; what is built, deliberately not built, and unvalidated | What exists / what was intended |
 | history/2026.md | Event log · decisions · experiments · dropped | Why is it this way; what was tried |
