@@ -52,11 +52,13 @@ def wall(labos_repo=False, identities=True):
     os.makedirs(hooks)
     os.makedirs(repo)
     shutil.copy(HOOK, hooks)
-    if identities:
-        # LABOS_ROOT_RE decides whether the public-surface token scan runs at all.
-        with open(os.path.join(hooks, "identities.local"), "w") as f:
-            f.write(IDENTITIES.replace("{labos_root_re}", repo if labos_repo else "never-matches-xyzzy"))
     git(repo, "init", "-q", "-b", "main")
+    if identities:
+        # LABOS_ROOT_RE decides whether the public-surface token scan runs at all. The hook matches
+        # it against git's toplevel, which on Windows is C:/… while os.path gives C:\….
+        root = git(repo, "rev-parse", "--show-toplevel").stdout.strip()
+        with open(os.path.join(hooks, "identities.local"), "w") as f:
+            f.write(IDENTITIES.replace("{labos_root_re}", root if labos_repo else "never-matches-xyzzy"))
     git(repo, "config", "user.email", "me@example.test")
     git(repo, "config", "user.name", "Me")
     git(repo, "config", "core.hooksPath", hooks)
@@ -110,7 +112,17 @@ def test_token_scan_does_not_run_outside_this_repo():
 
 def test_labos_allow_exempts_a_path():
     repo = wall(labos_repo=True)
-    with open(os.path.join(repo, ".labos-allow"), "w") as f:
+    with open(os.path.join(repo, ".labos-allow"), "w", newline="\n") as f:
+        f.write("c.txt\n")
+    git(repo, "add", ".labos-allow")
+    rc, err = commit(repo, "c.txt", "mentions forbidden-token-xyzzy here\n")
+    assert rc == 0, err
+
+
+def test_labos_allow_with_crlf_endings_exempts_a_path():
+    # Windows checks text files out with CRLF by default; the allowlist must still match.
+    repo = wall(labos_repo=True)
+    with open(os.path.join(repo, ".labos-allow"), "w", newline="\r\n") as f:
         f.write("c.txt\n")
     git(repo, "add", ".labos-allow")
     rc, err = commit(repo, "c.txt", "mentions forbidden-token-xyzzy here\n")

@@ -22,6 +22,8 @@
 # Test the restore path against an isolated home without auth/network:
 #   HOME=/tmp/labos-test LABOS_UMBRELLA="$PWD" bash scripts/bootstrap.sh --config-only
 set -uo pipefail
+# Windows Python defaults to the cp1252 code page; the helper scripts print and write UTF-8.
+export PYTHONUTF8=1
 
 MODE="full"
 [ "${1:-}" = "--config-only" ] && MODE="config"
@@ -35,10 +37,13 @@ CLAUDE_DIR="$HOME/.claude"
 CONFIG_REPO="${LABOS_CONFIG_REPO:-nmalick/labos-config}"
 CONFIG_DIR="${LABOS_CONFIG_DIR:-$HOME/.labos-config}"
 CLONE_LIST="$CONFIG_DIR/clone-list.tsv"
-# Claude derives a project slug from the absolute path: / _ . all become -
+# Claude derives a project slug from the absolute path: every non-alphanumeric character becomes -.
 # Derive it from $UMBRELLA rather than hardcoding, or memory restores to the
 # wrong path whenever $HOME or the umbrella location differs from this machine.
-MEM_REL="projects/$(printf '%s' "$UMBRELLA" | sed 's/[\/_.]/-/g')/memory"
+# On Windows Claude slugs the native path (C:\Users\… → C--Users-…), not Git Bash's /c/Users/….
+MEM_PATH="$UMBRELLA"
+command -v cygpath >/dev/null 2>&1 && MEM_PATH="$(cygpath -m "$UMBRELLA")"
+MEM_REL="projects/$(printf '%s' "$MEM_PATH" | sed 's/[^A-Za-z0-9]/-/g')/memory"
 ts="$(date +%Y%m%d-%H%M%S)"
 
 say()  { printf '\n\033[1m▶ %s\033[0m\n' "$1"; }
@@ -119,6 +124,9 @@ clone_repo() { # url bucket-dir slug
 if [ -f "$CLONE_LIST" ]; then
   n=0
   while IFS="$(printf '\t')" read -r url bucket slug || [ -n "${url:-}" ]; do
+    # A clone list checked out with CRLF endings leaves \r on the last field, and the slug then
+    # becomes an invalid path.
+    url="${url%$'\r'}"; slug="${slug%$'\r'}"
     case "${url:-}" in ''|'#'*) continue ;; esac
     [ -n "${bucket:-}" ] && [ -n "${slug:-}" ] || { warn "malformed clone-list row: ${url}"; continue; }
     clone_repo "$url" "$bucket" "$slug"; n=$((n+1))
@@ -191,6 +199,9 @@ else
 fi
 
 # Symlink umbrella commands so /personal-init and /labos-replicate are available globally.
+# Git Bash's ln -s copies unless MSYS asks for native links (allowed once Developer Mode is on);
+# a copy goes stale when the umbrella's command changes. Elsewhere the variable is ignored.
+export MSYS=winsymlinks:native
 mkdir -p "$CLAUDE_DIR/commands"
 for c in personal-init labos-replicate catalog-sync; do
   # Commands migrated to skills in the 2026-08 rebuild; support BOTH layouts so a fresh machine

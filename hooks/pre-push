@@ -58,7 +58,9 @@ fi
 ALLOW_LOCAL="$HOOK_DIR/allowlist.local"
 path_in_list() {
   [ -f "$2" ] || return 1
+  cr=$(printf '\r')
   while IFS= read -r line; do
+    line=${line%"$cr"}   # a CRLF checkout (Windows autocrlf) would otherwise never match
     case "$line" in ''|'#'*) continue ;; esac
     case "$1" in "$line"*) return 0 ;; esac
   done < "$2"
