@@ -64,7 +64,9 @@ LABOS_ALLOW="$toplevel/.labos-allow"        # tracked: paths that legitimately d
 
 path_in_list() { # $1=path $2=listfile — prefix match per line; comments/blank skipped
   [ -f "$2" ] || return 1
+  cr=$(printf '\r')
   while IFS= read -r line; do
+    line=${line%"$cr"}   # a CRLF checkout (Windows autocrlf) would otherwise never match
     case "$line" in ''|'#'*) continue ;; esac
     case "$1" in "$line"*) return 0 ;; esac
   done < "$2"

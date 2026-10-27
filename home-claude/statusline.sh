@@ -48,7 +48,7 @@ CACHE_MAX_AGE=5
 
 cache_stale() {
   [ ! -f "$GIT_CACHE" ] || \
-  [ $(( $(date +%s) - $(stat -f %m "$GIT_CACHE" 2>/dev/null || stat -c %Y "$GIT_CACHE" 2>/dev/null || echo 0) )) -gt $CACHE_MAX_AGE ]
+  [ $(( $(date +%s) - $(stat -c %Y "$GIT_CACHE" 2>/dev/null || stat -f %m "$GIT_CACHE" 2>/dev/null || echo 0) )) -gt $CACHE_MAX_AGE ]
 }
 
 git_part=""

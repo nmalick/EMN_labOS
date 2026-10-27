@@ -3,6 +3,8 @@
 # Switches gh + enforces git identity/hooks; reports (does not auto-login) the rest.
 # Idempotent and non-destructive — safe to run at the start of every session.
 set -uo pipefail
+# Windows Python defaults to the cp1252 code page and cannot print the connector reminder's ➜.
+export PYTHONUTF8=1
 
 EXPECTED_GH="nmalick"
 EXPECTED_NAME="Malick Ndiaye"
@@ -111,6 +113,9 @@ UMBRELLA="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # path. Writing the rule only into a worktree would also be useless — worktrees are disposable —
 # so the primary checkout is always a target. (2026-09)
 PRIMARY="$(dirname "$(git -C "$UMBRELLA" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || echo "$UMBRELLA/.git")")"
+# Git for Windows prints C:/… where pwd gives /c/…; re-resolve so the two compare equal and the
+# same settings file is not processed twice.
+PRIMARY="$(cd "$PRIMARY" 2>/dev/null && pwd || printf '%s' "$PRIMARY")"
 # Pick the first candidate that actually DEFINES the path — a worktree can hold a stale copy
 # that predates the variable, and taking it would silently skip the guard.
 IDF=""; IDF_ANY=""

@@ -20,6 +20,8 @@
 #   - CLAUDE.md and memory are ALWAYS routed local, regardless of token scan (token routing
 #     is a heuristic; these classes must never depend on it).
 set -euo pipefail
+# Windows Python defaults to the cp1252 code page; the settings filters write UTF-8.
+export PYTHONUTF8=1
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -36,8 +38,9 @@ fi
 SRC="$HOME/.claude"
 PUB="$REPO_ROOT/home-claude"
 LOC="$REPO_ROOT/home-claude.local"
-# Claude derives the project slug from the PRIMARY absolute path: / _ . all become -
-MEM_REL="projects/$(printf '%s' "$PRIMARY_ROOT" | sed 's/[\/_.]/-/g')/memory"
+# Claude derives the project slug from the PRIMARY absolute path: every non-alphanumeric
+# character becomes -, so git's C:/Users/… on Windows becomes C--Users-…
+MEM_REL="projects/$(printf '%s' "$PRIMARY_ROOT" | sed 's/[^A-Za-z0-9]/-/g')/memory"
 
 # Token classes (routing only — the pre-commit scan uses a narrower set; see hooks/).
 # The lists themselves are machine-local: naming a work org in this tracked, public script is
@@ -89,8 +92,8 @@ except Exception:
     d = {}
 allow = json.loads(sys.argv[3])
 out = {k: d[k] for k in allow if k in d}
-json.dump(out, open(sys.argv[2], "w"), indent=2)
-open(sys.argv[2], "a").write("\n")
+json.dump(out, open(sys.argv[2], "w", newline="\n"), indent=2)
+open(sys.argv[2], "a", newline="\n").write("\n")
 PY
 fi
 
@@ -110,8 +113,8 @@ for i, v in enumerate(keep):
     if i:
         key = "%s-%d" % (key, i + 1)
     out[key] = v
-json.dump(out, open(sys.argv[2], "w"), indent=2)
-open(sys.argv[2], "a").write("\n")
+json.dump(out, open(sys.argv[2], "w", newline="\n"), indent=2)
+open(sys.argv[2], "a", newline="\n").write("\n")
 PY
 fi
 
@@ -121,6 +124,13 @@ copy_md_dir() { # name
   find "$SRC/$1" -maxdepth 1 -type f -name '*.md' -exec cp {} "$STAGE/$1/" \;
 }
 copy_md_dir commands
+# bootstrap links the umbrella's own commands into ~/.claude/commands, and find -type f skips the
+# links. Where ln -s made copies instead (Git Bash without symlink rights), drop the copies that
+# match the umbrella's file: they are its entry points, not machine config.
+for f in "$STAGE/commands"/*.md; do
+  [ -f "$f" ] && cmp -s "$f" "$REPO_ROOT/.claude/commands/$(basename "$f")" && rm -f "$f"
+done
+rmdir "$STAGE/commands" 2>/dev/null || true
 copy_md_dir agents
 
 # memory (labOS memory dir only — never transcripts). Resolved from the PRIMARY slug.
@@ -139,7 +149,7 @@ except Exception:
     d = {}
 work = re.compile(sys.argv[3], re.I)
 plugins = sorted(p for p in d.get("enabledPlugins", {}) if not work.search(p))
-open(sys.argv[2], "w").write(("\n".join(plugins) + "\n") if plugins else "")
+open(sys.argv[2], "w", newline="\n").write(("\n".join(plugins) + "\n") if plugins else "")
 PY
 fi
 
