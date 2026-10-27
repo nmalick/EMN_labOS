@@ -52,9 +52,9 @@ machine-local `CONFIG_REPO_RE`); the author check still runs there.
 ## Projects (on disk, gitignored)
 | Bucket | Projects |
 |---|---|
-| `personal-projects/` | Qari, qari-assets, emnlabs_site |
+| `personal-projects/` | Qari, qari-assets, emnlabs_site, soxla |
 | `freelance-projects/` | art_is_everywear |
-| `pocs/` | bil-app, safar |
+| `pocs/` | bil-app, safar, ar-character, minesweeper |
 
 Each project's documentation lives in its own repo under `project-os/` — the generated
 `registry/<slug>-index.md` pointer indexes route into them from here.
