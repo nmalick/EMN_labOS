@@ -108,14 +108,16 @@ def read_project_index(m):
     d = os.path.join(pdir, "project-os", "DIRECTORY.md")
     if os.path.isfile(d):
         out["has_kit"] = True
+        # Keep the |---| separator row: without it the copied table renders as plain text.
         for line in open(d, encoding="utf-8", errors="replace"):
-            if line.strip().startswith("|") and line.count("|") >= 3 and "---" not in line:
+            if line.strip().startswith("|") and line.count("|") >= 3:
                 out["reference_rows"].append(line.rstrip())
     arch = os.path.join(pdir, "project-os", "engineering", "architecture.md")
     if os.path.isfile(arch):
         for line in open(arch, encoding="utf-8", errors="replace"):
             if "Last commit checked" in line:
-                out["cursor"] = line.strip().lstrip(">* ").strip()
+                # Drop only a blockquote marker; lstrip(">* ") also ate the opening "**".
+                out["cursor"] = re.sub(r"^>\s*", "", line.strip())
                 break
     return out
 

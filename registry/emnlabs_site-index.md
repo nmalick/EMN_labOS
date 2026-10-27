@@ -4,9 +4,10 @@
 
 _Generated pointer into the project's own `project-os/`; content lives in the project repo._
 
-> Repo**: nmalick/emnlabs_site · **Last commit checked**: `ac17262` (2026-07-19) · **Last updated**: 2026-08-03
+> **Repo**: nmalick/emnlabs_site · **Last commit checked**: `ac17262` (2026-07-19) · **Last updated**: 2026-08-03
 
 | Doc | Contains | Reference when |
+|---|---|---|
 | engineering/architecture.md | Code-verified architecture (214 claims): stack, Friday runtime deep-dive, Firestore data layer, rules, analytics, deploy | Any stack/structure question — BEFORE code |
 | product/features.md | Feature inventory (SHIPPED/DROPPED/PLANNED rows) incl. Friday + the pre-redesign dead generation | What exists vs promised |
 | product/status.md | Current one-pager (live at emnlabs.io) | Quick state |

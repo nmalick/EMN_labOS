@@ -4,9 +4,11 @@
 
 _Generated pointer into the project's own `project-os/`; content lives in the project repo._
 
-> Repo**: nmalick/soxla (private) · **Last commit checked**: `89a349a` (2026-10-25) · **Last updated**: 2026-10-25
+> **Repo**: nmalick/soxla (private) · **Last commit checked**: `89a349a` (2026-10-25) · **Last updated**: 2026-10-25
 
 | Doc | Contains | Reference when |
+|---|---|---|
+| plans/tracker.md | Work done, owner decisions, approved next spec, ordered task list | **Start of every session** |
 | engineering/architecture.md | Code-verified architecture of the coming-soon site (cursor header) | Any stack/structure question — BEFORE reading code |
 | engineering/adr/0001-waitlist-store.md | Why signups go to a private Vercel Blob store | Touching the waitlist or choosing a database |
 | product/features.md | What the landing page does today; what the WordPress site did | What exists / what existed |
