@@ -16,12 +16,19 @@
 # identities.local filename rule + the secret-content scan there — the author check still runs.
 #
 # Env: LABOS_CONFIG_REPO (default nmalick/labos-config) · LABOS_CONFIG_DIR (default
-#      $HOME/.labos-config) · LABOS_UMBRELLA (default $HOME/EMN_labOS)
+#      $HOME/.labos-config) · LABOS_UMBRELLA (default: the primary checkout holding this script)
 set -uo pipefail
 
 CONFIG_REPO="${LABOS_CONFIG_REPO:-nmalick/labos-config}"
 CONFIG_DIR="${LABOS_CONFIG_DIR:-$HOME/.labos-config}"
-UMBRELLA="${LABOS_UMBRELLA:-$HOME/EMN_labOS}"
+# Resolve the umbrella from this script, not $HOME/EMN_labOS: the umbrella can live anywhere.
+# Take the primary checkout, as scripts/personal-init.sh does — a worktree lacks the gitignored
+# payload and is disposable, so restoring into it or pointing core.hooksPath at it would not
+# stick. Re-resolve with pwd because Git for Windows prints C:/… where pwd gives /c/…. (2026-10)
+SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PRIMARY="$(dirname "$(git -C "$SCRIPT_ROOT" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || echo "$SCRIPT_ROOT/.git")")"
+PRIMARY="$(cd "$PRIMARY" 2>/dev/null && pwd || printf '%s' "$PRIMARY")"
+UMBRELLA="${LABOS_UMBRELLA:-$PRIMARY}"
 CLONE_LIST="clone-list.tsv"
 
 ok()   { printf '  \033[32m✓\033[0m %s\n' "$1"; }
